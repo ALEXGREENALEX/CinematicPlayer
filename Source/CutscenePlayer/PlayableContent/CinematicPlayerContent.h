@@ -27,17 +27,17 @@ public:
 
 	virtual void OpenAndPlayContent() { ; }
 	virtual void PlaybackStarted();
-	virtual void SkipAndDestroy();
+	virtual void StopAndDestroy();
 	virtual void FinishAndDestroy();
 
-	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", DisplayName = "Skip (Stop)")
-	virtual void Skip() { ; }
+	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", DisplayName = "Stop (Skip)")
+	virtual void Stop() { ; }
 
 	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer")
-	virtual void Pause();
+	virtual void Pause() { ; }
 
 	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer")
-	virtual void Resume();
+	virtual void Resume() { ; }
 
 	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer|Input")
 	void PressAnyKey(bool bPressed);
@@ -53,7 +53,7 @@ protected:
 	void ReceiveOnStart();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer|Events")
-	void ReceiveOnSkip();
+	void ReceiveOnStop();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer|Events")
 	void ReceiveOnFinish();
@@ -69,10 +69,10 @@ public:
 	FPlayCutsceneResult OnStart;
 
 	UPROPERTY(BlueprintAssignable)
-	FPlayCutsceneResult OnFinish;
+	FPlayCutsceneResult OnStop;
 
 	UPROPERTY(BlueprintAssignable)
-	FPlayCutsceneResult OnSkip;
+	FPlayCutsceneResult OnFinish;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer")
 	bool bCanSkip = true;

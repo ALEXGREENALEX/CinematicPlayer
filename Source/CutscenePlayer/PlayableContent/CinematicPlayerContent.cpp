@@ -50,20 +50,20 @@ void ACinematicPlayerContent::PlaybackStarted()
 	{
 		OnStart.Broadcast();
 	}
-	
-		if (IsValid(PlayerWidget))
+
+	if (IsValid(PlayerWidget))
 	{
 		ICinematicPlayerInterface::Execute_Start(PlayerWidget);
 	}
 }
 
-void ACinematicPlayerContent::SkipAndDestroy()
+void ACinematicPlayerContent::StopAndDestroy()
 {
-	ReceiveOnSkip();
+	ReceiveOnStop();
 
-	if (OnSkip.IsBound())
+	if (OnStop.IsBound())
 	{
-		OnSkip.Broadcast();
+		OnStop.Broadcast();
 	}
 
 	Destroy();
@@ -79,22 +79,6 @@ void ACinematicPlayerContent::FinishAndDestroy()
 	}
 
 	Destroy();
-}
-
-void ACinematicPlayerContent::Pause()
-{
-	if (IsValid(PlayerWidget))
-	{
-		ICinematicPlayerInterface::Execute_SetPaused(PlayerWidget, true);
-	}
-}
-
-void ACinematicPlayerContent::Resume()
-{
-	if (IsValid(PlayerWidget))
-	{
-		ICinematicPlayerInterface::Execute_SetPaused(PlayerWidget, false);
-	}
 }
 
 void ACinematicPlayerContent::PressAnyKey(bool bPressed)

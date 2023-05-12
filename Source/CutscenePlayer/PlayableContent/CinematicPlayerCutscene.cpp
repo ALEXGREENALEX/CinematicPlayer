@@ -51,7 +51,7 @@ void ACinematicPlayerCutscene::OpenAndPlayContent()
 	}
 }
 
-void ACinematicPlayerCutscene::Skip()
+void ACinematicPlayerCutscene::Stop()
 {
 	if (LevelSequencePlayer.IsValid())
 	{
@@ -67,8 +67,6 @@ void ACinematicPlayerCutscene::Pause()
 	{
 		LevelSequencePlayer->Pause();
 	}
-
-	Super::Pause();
 }
 
 void ACinematicPlayerCutscene::Resume()
@@ -77,8 +75,6 @@ void ACinematicPlayerCutscene::Resume()
 	{
 		LevelSequencePlayer->Play();
 	}
-
-	Super::Resume();
 }
 
 void ACinematicPlayerCutscene::OnPlayCallback()
@@ -93,7 +89,7 @@ void ACinematicPlayerCutscene::OnPlayCallback()
 
 void ACinematicPlayerCutscene::OnStopCallback()
 {
-	SkipAndDestroy();
+	StopAndDestroy();
 }
 
 void ACinematicPlayerCutscene::OnFinishedCallback()

@@ -42,11 +42,11 @@ void ACinematicPlayerMovie::OpenAndPlayContent()
 	if (!IsValid(MediaPlayer) || !IsValid(MediaFile) || !MediaPlayer->OpenSource(MediaFile))
 	{
 		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: Can't Play MediaFile!"), ANSI_TO_TCHAR(__FUNCTION__));
-		OnMediaClosed();
+		StopAndDestroy();
 	}
 }
 
-void ACinematicPlayerMovie::Skip()
+void ACinematicPlayerMovie::Stop()
 {
 	if (IsValid(MediaPlayer))
 	{
@@ -68,7 +68,7 @@ void ACinematicPlayerMovie::Resume()
 	{
 		MediaPlayer->Play(); // Start or Resume Playback
 
-		if (!MediaPlayer->IsPaused())  // Game was paused on Start
+		if (!MediaPlayer->IsPaused()) // Game was paused on Start
 		{
 			PlaybackStarted();
 		}
@@ -88,18 +88,18 @@ void ACinematicPlayerMovie::OnMediaOpened(FString OpenedUrl)
 	}
 	else // On some Error
 	{
-		OnMediaClosed();
+		StopAndDestroy();
 	}
 }
 
 void ACinematicPlayerMovie::OnMediaOpenFailed(FString FailedUrl)
 {
-	OnMediaClosed();
+	StopAndDestroy();
 }
 
 void ACinematicPlayerMovie::OnMediaClosed()
 {
-	SkipAndDestroy();
+	StopAndDestroy();
 }
 
 void ACinematicPlayerMovie::OnEndReached()

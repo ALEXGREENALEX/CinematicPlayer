@@ -17,12 +17,12 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void OpenAndPlayContent() override;
-	virtual void Skip() override;
+	virtual void Stop() override;
 	virtual void Pause() override;
 	virtual void Resume() override;
 	// End ACinematicPlayerContent overrides
 
-protected:
+private:
 	UFUNCTION()
 	void OnMediaOpened(FString OpenedUrl);
 

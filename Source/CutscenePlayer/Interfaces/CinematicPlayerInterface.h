@@ -18,12 +18,9 @@ class CINEMATICPLAYER_API ICinematicPlayerInterface
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CinematicPlayer")
 	void Initialize(ACinematicPlayerContent* PlayableContent);
-	
-		UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CinematicPlayer")
-	void Start();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CinematicPlayer")
-	void SetPaused(bool bPaused);
+	void Start();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CinematicPlayer")
 	void HideAndDestroy();

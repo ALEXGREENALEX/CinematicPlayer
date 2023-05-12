@@ -47,7 +47,7 @@ void UPlayCinematicAsync::Activate()
 		PlayableContent = World->SpawnActorDeferred<ACinematicPlayerContent>(ContentClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 		PlayableContent->OnStart.AddDynamic(this, &UPlayCinematicAsync::StartCallback);
-		PlayableContent->OnSkip.AddDynamic(this, &UPlayCinematicAsync::SkipCallback);
+		PlayableContent->OnStop.AddDynamic(this, &UPlayCinematicAsync::StopCallback);
 		PlayableContent->OnFinish.AddDynamic(this, &UPlayCinematicAsync::FinishCallback);
 
 		PlayableContent->Initialize(PlayerController.Get());
@@ -60,7 +60,7 @@ void UPlayCinematicAsync::SetReadyToDestroy()
 	if (IsValid(PlayableContent))
 	{
 		PlayableContent->OnStart.RemoveDynamic(this, &UPlayCinematicAsync::StartCallback);
-		PlayableContent->OnSkip.RemoveDynamic(this, &UPlayCinematicAsync::SkipCallback);
+		PlayableContent->OnStop.RemoveDynamic(this, &UPlayCinematicAsync::StopCallback);
 		PlayableContent->OnFinish.RemoveDynamic(this, &UPlayCinematicAsync::FinishCallback);
 
 		PlayableContent->Destroy();
@@ -78,11 +78,11 @@ void UPlayCinematicAsync::StartCallback()
 	}
 }
 
-void UPlayCinematicAsync::SkipCallback()
+void UPlayCinematicAsync::StopCallback()
 {
-	if (OnSkip.IsBound())
+	if (OnStop.IsBound())
 	{
-		OnSkip.Broadcast();
+		OnStop.Broadcast();
 	}
 
 	SetReadyToDestroy();

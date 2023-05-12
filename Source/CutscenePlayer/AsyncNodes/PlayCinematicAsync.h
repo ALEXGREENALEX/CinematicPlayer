@@ -29,23 +29,26 @@ private:
 	void StartCallback();
 
 	UFUNCTION()
-	void FinishCallback();
+	void StopCallback();
 
 	UFUNCTION()
-	void SkipCallback();
+	void FinishCallback();
 
 public:
 	UPROPERTY(Transient)
 	ACinematicPlayerContent* PlayableContent;
 
+	// A delegate that is invoked once after content playback will started.
 	UPROPERTY(BlueprintAssignable, DisplayName = "Start")
 	FPlayCutsceneAsyncResult OnStart;
 
+	// A delegate that is invoked when playback Stopped (or Skipped) and can't Finished.
+	UPROPERTY(BlueprintAssignable, DisplayName = "Stop")
+	FPlayCutsceneAsyncResult OnStop;
+
+	// A delegate that is invoked when playback has reached the end.
 	UPROPERTY(BlueprintAssignable, DisplayName = "Finish")
 	FPlayCutsceneAsyncResult OnFinish;
-
-	UPROPERTY(BlueprintAssignable, DisplayName = "Skip")
-	FPlayCutsceneAsyncResult OnSkip;
 
 private:
 	TWeakObjectPtr<APlayerController> PlayerController;
