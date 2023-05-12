@@ -12,13 +12,10 @@ public class CinematicPlayer : ModuleRules
 		{
 			"Core",
 			"CoreUObject",
-			"DeveloperSettings",
 			"Engine",
 			"LevelSequence",
 			"MediaAssets",
 			"MovieScene",
-			"Slate",
-			"SlateCore",
 			"UMG",
 		});
 	}
