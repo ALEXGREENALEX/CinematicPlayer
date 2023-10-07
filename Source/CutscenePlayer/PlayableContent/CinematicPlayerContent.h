@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <CoreMinimal.h>
+#include <GameFramework/Actor.h>
 #include "CinematicPlayerContent.generated.h"
 
 class APlayerController;

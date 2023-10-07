@@ -1,4 +1,5 @@
 ﻿#include "CinematicPlayerMovie.h"
+#include <GameFramework/PlayerController.h>
 #include <FileMediaSource.h>
 #include <MediaPlayer.h>
 

@@ -1,5 +1,6 @@
 ﻿#include "PlayCinematicAsync.h"
 #include <Engine/World.h>
+#include <GameFramework/PlayerController.h>
 #include "PlayableContent/CinematicPlayerContent.h"
 
 DEFINE_LOG_CATEGORY(LogCinematicPlayer);
