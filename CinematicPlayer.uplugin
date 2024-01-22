@@ -9,6 +9,8 @@
 	"CreatedByURL": "https://github.com/ALEXGREENALEX/CinematicPlayer",
 	"DocsURL": "",
 	"MarketplaceURL": "",
+	"SupportURL": "",
+	"EnabledByDefault": false,
 	"CanContainContent": true,
 	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
