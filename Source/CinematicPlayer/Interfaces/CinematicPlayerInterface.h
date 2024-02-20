@@ -5,7 +5,7 @@
 
 class ACinematicPlayerContent;
 
-UINTERFACE(NotBlueprintable, MinimalAPI)
+UINTERFACE(MinimalAPI, Blueprintable)
 class UCinematicPlayerInterface : public UInterface
 {
 	GENERATED_BODY()
