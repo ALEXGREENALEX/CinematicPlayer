@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CinematicPlayerContent.h"
+#include <Templates/SubclassOf.h>
 #include "CinematicPlayerCutscene.generated.h"
 
 class ULevelSequence;
@@ -13,6 +14,8 @@ class CINEMATICPLAYER_API ACinematicPlayerCutscene : public ACinematicPlayerCont
 	GENERATED_BODY()
 
 public:
+	ACinematicPlayerCutscene(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
 	// Begin ACinematicPlayerContent overrides
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -36,6 +39,9 @@ private:
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer")
 	ULevelSequence* LevelSequence;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer")
+	TSubclassOf<ALevelSequenceActor> LevelSequenceActorClass;
 
 private:
 	UPROPERTY(Transient)

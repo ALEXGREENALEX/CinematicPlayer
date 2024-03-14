@@ -1,8 +1,7 @@
 ﻿#include "CinematicPlayerContent.h"
 #include <Blueprint/UserWidget.h>
+#include "Logs/CinematicPlayerLogs.h"
 #include "Interfaces/CinematicPlayerInterface.h"
-
-DEFINE_LOG_CATEGORY(LogCinematicPlayerContent);
 
 void ACinematicPlayerContent::Initialize(APlayerController* PlayerController)
 {
@@ -15,7 +14,7 @@ void ACinematicPlayerContent::BeginPlay()
 
 	if (!IsValid(OwningPlayerController))
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: OwningPlayerController isn't Valid!"), ANSI_TO_TCHAR(__FUNCTION__));
+		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: OwningPlayerController is Not Valid!"), FUNC_STR);
 		Destroy();
 		return;
 	}
@@ -101,13 +100,13 @@ void ACinematicPlayerContent::CreatePlayerWidget()
 {
 	if (!IsValid(OwningPlayerController))
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: OwningPlayerController isn't Valid!"), ANSI_TO_TCHAR(__FUNCTION__));
+		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: OwningPlayerController is Not Valid!"), FUNC_STR);
 		return;
 	}
 
 	if (!WidgetClass->ImplementsInterface(UCinematicPlayerInterface::StaticClass()))
 	{
-		UE_LOG(LogCinematicPlayerContent, Warning, TEXT("%s :: WidgetClass class must implement CinematicPlayerInterface!"), ANSI_TO_TCHAR(__FUNCTION__));
+		UE_LOG(LogCinematicPlayerContent, Warning, TEXT("%s :: WidgetClass class must implement CinematicPlayerInterface!"), FUNC_STR);
 		return;
 	}
 

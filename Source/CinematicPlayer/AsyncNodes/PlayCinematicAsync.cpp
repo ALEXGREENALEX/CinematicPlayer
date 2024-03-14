@@ -1,9 +1,8 @@
 ﻿#include "PlayCinematicAsync.h"
 #include <Engine/World.h>
 #include <GameFramework/PlayerController.h>
+#include "Logs/CinematicPlayerLogs.h"
 #include "PlayableContent/CinematicPlayerContent.h"
-
-DEFINE_LOG_CATEGORY(LogCinematicPlayer);
 
 UPlayCinematicAsync* UPlayCinematicAsync::PlayCinematicAsync(UObject* WorldContextObject, APlayerController* PlayerController, TSoftClassPtr<ACinematicPlayerContent> Content)
 {
@@ -29,7 +28,7 @@ void UPlayCinematicAsync::Activate()
 
 	if (!PlayerController.IsValid())
 	{
-		UE_LOG(LogCinematicPlayer, Error, TEXT("%s :: PlayerController isn't Valid!"), ANSI_TO_TCHAR(__FUNCTION__));
+		UE_LOG(LogCinematicPlayer, Error, TEXT("%s :: PlayerController is Not Valid!"), FUNC_STR);
 		SetReadyToDestroy();
 		return;
 	}
@@ -37,7 +36,7 @@ void UPlayCinematicAsync::Activate()
 	const TSubclassOf<ACinematicPlayerContent> ContentClass = ContentSoftClass.IsNull() ? nullptr : ContentSoftClass.LoadSynchronous();
 	if (!IsValid(ContentClass))
 	{
-		UE_LOG(LogCinematicPlayer, Error, TEXT("%s :: ContentClass isn't Valid!"), ANSI_TO_TCHAR(__FUNCTION__));
+		UE_LOG(LogCinematicPlayer, Error, TEXT("%s :: ContentClass is Not Valid!"), FUNC_STR);
 		SetReadyToDestroy();
 		return;
 	}

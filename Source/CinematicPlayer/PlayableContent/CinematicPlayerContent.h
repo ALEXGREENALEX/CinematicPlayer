@@ -7,8 +7,6 @@
 class APlayerController;
 class UUserWidget;
 
-DECLARE_LOG_CATEGORY_EXTERN(LogCinematicPlayerContent, Log, All);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayCutsceneResult);
 
 // CinematicPlayer playable content, must be used only by PlayCinematicAsync function (UPlayCinematicAsync).

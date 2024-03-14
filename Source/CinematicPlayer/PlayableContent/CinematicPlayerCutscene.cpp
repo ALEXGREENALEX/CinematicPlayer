@@ -1,16 +1,47 @@
 ﻿#include "CinematicPlayerCutscene.h"
+#include <Engine/World.h>
 #include <LevelSequenceActor.h>
 #include <LevelSequencePlayer.h>
+#include "Logs/CinematicPlayerLogs.h"
+
+ACinematicPlayerCutscene::ACinematicPlayerCutscene(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer),
+	  LevelSequence(nullptr),
+	  LevelSequenceActorClass(ALevelSequenceActor::StaticClass())
+{
+}
 
 void ACinematicPlayerCutscene::BeginPlay()
 {
-	ALevelSequenceActor* SequenceActor;
-	LevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(this, LevelSequence, {}, SequenceActor);
-	LevelSequenceActor = SequenceActor;
+	if (!IsValid(LevelSequence))
+	{
+		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: LevelSequence is Not Valid!"), FUNC_STR);
+		return;
+	}
 
+	UWorld* World = GetWorld();
+	if (!IsValid(World) || World->bIsTearingDown)
+	{
+		return;
+	}
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.ObjectFlags |= RF_Transient;
+	SpawnParams.bAllowDuringConstructionScript = true;
+	SpawnParams.bDeferConstruction = true; // Defer construction for autoplay so that BeginPlay() is called
+
+	LevelSequenceActor = World->SpawnActor<ALevelSequenceActor>(LevelSequenceActorClass, SpawnParams);
+	LevelSequenceActor->SetSequence(LevelSequence);
+	LevelSequenceActor->InitializePlayer();
+
+	const FTransform DefaultTransform;
+	LevelSequenceActor->FinishSpawning(DefaultTransform);
+
+	LevelSequencePlayer = LevelSequenceActor->SequencePlayer;
 	if (!LevelSequencePlayer.IsValid())
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: LevelSequencePlayer isn't Valid!"), ANSI_TO_TCHAR(__FUNCTION__));
+		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: LevelSequencePlayer is Not Valid!"), FUNC_STR);
 		Destroy();
 		return;
 	}

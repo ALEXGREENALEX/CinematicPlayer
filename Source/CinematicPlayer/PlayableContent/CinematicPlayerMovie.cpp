@@ -2,12 +2,13 @@
 #include <GameFramework/PlayerController.h>
 #include <FileMediaSource.h>
 #include <MediaPlayer.h>
+#include "Logs/CinematicPlayerLogs.h"
 
 void ACinematicPlayerMovie::BeginPlay()
 {
 	if (!IsValid(MediaPlayer))
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: MediaPlayer isn't Valid!"), ANSI_TO_TCHAR(__FUNCTION__));
+		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: MediaPlayer is Not Valid!"), FUNC_STR);
 		Destroy();
 		return;
 	}
@@ -42,7 +43,7 @@ void ACinematicPlayerMovie::OpenAndPlayContent()
 {
 	if (!IsValid(MediaPlayer) || !IsValid(MediaFile) || !MediaPlayer->OpenSource(MediaFile))
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: Can't Play MediaFile!"), ANSI_TO_TCHAR(__FUNCTION__));
+		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: Can't Play MediaFile!"), FUNC_STR);
 		StopAndDestroy();
 	}
 }

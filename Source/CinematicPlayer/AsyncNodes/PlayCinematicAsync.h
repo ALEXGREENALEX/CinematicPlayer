@@ -4,8 +4,6 @@
 #include <Kismet/BlueprintAsyncActionBase.h>
 #include "PlayCinematicAsync.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogCinematicPlayer, Log, All);
-
 class ACinematicPlayerContent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayCutsceneAsyncResult);
