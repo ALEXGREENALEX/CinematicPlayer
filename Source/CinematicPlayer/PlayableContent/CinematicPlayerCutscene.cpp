@@ -4,6 +4,8 @@
 #include <LevelSequencePlayer.h>
 #include "Logs/CinematicPlayerLogs.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(CinematicPlayerCutscene)
+
 ACinematicPlayerCutscene::ACinematicPlayerCutscene(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer),
 	  LevelSequence(nullptr),

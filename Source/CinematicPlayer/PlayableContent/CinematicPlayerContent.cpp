@@ -3,7 +3,9 @@
 #include "Logs/CinematicPlayerLogs.h"
 #include "Interfaces/CinematicPlayerInterface.h"
 
-void ACinematicPlayerContent::Initialize(APlayerController* PlayerController)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(CinematicPlayerContent)
+
+void ACinematicPlayerContent::Initialize(TWeakObjectPtr<APlayerController> PlayerController)
 {
 	OwningPlayerController = PlayerController;
 }
@@ -12,7 +14,7 @@ void ACinematicPlayerContent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!IsValid(OwningPlayerController))
+	if (!OwningPlayerController.IsValid())
 	{
 		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: OwningPlayerController is Not Valid!"), FUNC_STR);
 		Destroy();
@@ -20,25 +22,23 @@ void ACinematicPlayerContent::BeginPlay()
 	}
 
 	CreatePlayerWidget();
-	EnableInput(OwningPlayerController); // Enable receive Input from PlayerController
-	EnableInputMapping(OwningPlayerController); // Add Input Mapping
+	EnableInput(OwningPlayerController.Get()); // Enable receive Input from PlayerController
+	EnableInputMapping(OwningPlayerController.Get()); // Add Input Mapping
 
 	OpenAndPlayContent();
 }
 
 void ACinematicPlayerContent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (IsValid(OwningPlayerController))
+	if (OwningPlayerController.IsValid())
 	{
-		DisableInputMapping(OwningPlayerController); // Remove Input Mapping
-		DisableInput(OwningPlayerController); // Disable receive Input from PlayerController
+		DisableInputMapping(OwningPlayerController.Get()); // Remove Input Mapping
+		DisableInput(OwningPlayerController.Get()); // Disable receive Input from PlayerController
 	}
 
 	RemovePlayerWidget();
 
 	Super::EndPlay(EndPlayReason);
-
-	OwningPlayerController = nullptr;
 }
 
 void ACinematicPlayerContent::PlaybackStarted()
@@ -50,9 +50,9 @@ void ACinematicPlayerContent::PlaybackStarted()
 		OnStart.Broadcast();
 	}
 
-	if (IsValid(PlayerWidget))
+	if (PlayerWidget.IsValid())
 	{
-		ICinematicPlayerInterface::Execute_Start(PlayerWidget);
+		ICinematicPlayerInterface::Execute_Start(PlayerWidget.Get());
 	}
 }
 
@@ -82,23 +82,23 @@ void ACinematicPlayerContent::FinishAndDestroy()
 
 void ACinematicPlayerContent::PressAnyKey(bool bPressed)
 {
-	if (IsValid(PlayerWidget))
+	if (PlayerWidget.IsValid())
 	{
-		ICinematicPlayerInterface::Execute_AnyKeyPressed(PlayerWidget, bPressed);
+		ICinematicPlayerInterface::Execute_AnyKeyPressed(PlayerWidget.Get(), bPressed);
 	}
 }
 
 void ACinematicPlayerContent::PressSkipKey(bool bPressed)
 {
-	if (IsValid(PlayerWidget))
+	if (PlayerWidget.IsValid())
 	{
-		ICinematicPlayerInterface::Execute_SkipKeyPressed(PlayerWidget, bPressed);
+		ICinematicPlayerInterface::Execute_SkipKeyPressed(PlayerWidget.Get(), bPressed);
 	}
 }
 
 void ACinematicPlayerContent::CreatePlayerWidget()
 {
-	if (!IsValid(OwningPlayerController))
+	if (!OwningPlayerController.IsValid())
 	{
 		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: OwningPlayerController is Not Valid!"), FUNC_STR);
 		return;
@@ -110,20 +110,20 @@ void ACinematicPlayerContent::CreatePlayerWidget()
 		return;
 	}
 
-	PlayerWidget = CreateWidget(OwningPlayerController, WidgetClass);
-	if (IsValid(PlayerWidget))
+	PlayerWidget = CreateWidget(OwningPlayerController.Get(), WidgetClass);
+	if (PlayerWidget.IsValid())
 	{
-		ICinematicPlayerInterface::Execute_Initialize(PlayerWidget, this);
+		ICinematicPlayerInterface::Execute_Initialize(PlayerWidget.Get(), this);
 		PlayerWidget->AddToViewport(WidgetsZOrder);
 	}
 }
 
 void ACinematicPlayerContent::RemovePlayerWidget()
 {
-	if (IsValid(PlayerWidget))
+	if (PlayerWidget.IsValid())
 	{
-		ICinematicPlayerInterface::Execute_HideAndDestroy(PlayerWidget);
+		ICinematicPlayerInterface::Execute_HideAndDestroy(PlayerWidget.Get());
 	}
 
-	PlayerWidget = nullptr;
+	PlayerWidget.Reset();
 }

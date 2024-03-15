@@ -4,6 +4,8 @@
 #include <MediaPlayer.h>
 #include "Logs/CinematicPlayerLogs.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(CinematicPlayerMovie)
+
 void ACinematicPlayerMovie::BeginPlay()
 {
 	if (!IsValid(MediaPlayer))
@@ -81,7 +83,7 @@ void ACinematicPlayerMovie::OnMediaOpened(FString OpenedUrl)
 {
 	if (IsValid(MediaPlayer))
 	{
-		const bool bNeedPauseOnStart = bCanPause && IsValid(OwningPlayerController) && OwningPlayerController->IsPaused();
+		const bool bNeedPauseOnStart = bCanPause && OwningPlayerController.IsValid() && OwningPlayerController->IsPaused();
 		if (!bNeedPauseOnStart)
 		{
 			MediaPlayer->Play();

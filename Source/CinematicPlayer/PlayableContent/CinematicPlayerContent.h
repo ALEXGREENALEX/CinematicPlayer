@@ -17,7 +17,7 @@ class CINEMATICPLAYER_API ACinematicPlayerContent : public AActor
 	GENERATED_BODY()
 
 public:
-	virtual void Initialize(APlayerController* PlayerController);
+	virtual void Initialize(TWeakObjectPtr<APlayerController> PlayerController);
 
 	// Begin AActor overrides
 	virtual void BeginPlay() override;
@@ -84,8 +84,8 @@ public:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "CinematicPlayer")
-	APlayerController* OwningPlayerController;
+	TWeakObjectPtr<APlayerController> OwningPlayerController;
 
 	UPROPERTY(BlueprintReadOnly, Category = "CinematicPlayer")
-	UUserWidget* PlayerWidget;
+	TWeakObjectPtr<UUserWidget> PlayerWidget;
 };

@@ -38,7 +38,7 @@ private:
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer")
-	ULevelSequence* LevelSequence;
+	TObjectPtr<ULevelSequence> LevelSequence;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer")
 	TSubclassOf<ALevelSequenceActor> LevelSequenceActorClass;

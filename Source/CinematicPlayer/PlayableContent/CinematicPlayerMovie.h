@@ -37,11 +37,11 @@ private:
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer")
-	UFileMediaSource* MediaFile;
+	TObjectPtr<UFileMediaSource> MediaFile;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer")
 	bool bCanPause = true;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer", AdvancedDisplay)
-	UMediaPlayer* MediaPlayer;
+	TObjectPtr<UMediaPlayer> MediaPlayer;
 };

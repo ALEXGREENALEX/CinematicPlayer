@@ -33,9 +33,6 @@ private:
 	void FinishCallback();
 
 public:
-	UPROPERTY(Transient)
-	ACinematicPlayerContent* PlayableContent;
-
 	// A delegate that is invoked once after content playback will started.
 	UPROPERTY(BlueprintAssignable, DisplayName = "Start")
 	FPlayCutsceneAsyncResult OnStart;
@@ -53,4 +50,7 @@ private:
 
 	UPROPERTY(Transient)
 	TSoftClassPtr<ACinematicPlayerContent> ContentSoftClass;
+
+	UPROPERTY(Transient)
+	TWeakObjectPtr<ACinematicPlayerContent> PlayableContent;
 };

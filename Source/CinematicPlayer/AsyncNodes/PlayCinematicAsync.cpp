@@ -4,13 +4,15 @@
 #include "Logs/CinematicPlayerLogs.h"
 #include "PlayableContent/CinematicPlayerContent.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PlayCinematicAsync)
+
 UPlayCinematicAsync* UPlayCinematicAsync::PlayCinematicAsync(UObject* WorldContextObject, APlayerController* PlayerController, TSoftClassPtr<ACinematicPlayerContent> Content)
 {
 	UPlayCinematicAsync* Action = NewObject<UPlayCinematicAsync>(WorldContextObject);
 	Action->PlayerController = PlayerController;
 	Action->ContentSoftClass = Content;
 
-	if (PlayerController == nullptr)
+	if (!Action->PlayerController.IsValid())
 	{
 		const UWorld* World = IsValid(WorldContextObject) ? WorldContextObject->GetWorld() : nullptr;
 		if (IsValid(World))
@@ -25,6 +27,12 @@ UPlayCinematicAsync* UPlayCinematicAsync::PlayCinematicAsync(UObject* WorldConte
 void UPlayCinematicAsync::Activate()
 {
 	Super::Activate();
+
+	UWorld* World = GetWorld();
+	if (!IsValid(World) || World->bIsTearingDown)
+	{
+		return;
+	}
 
 	if (!PlayerController.IsValid())
 	{
@@ -41,30 +49,35 @@ void UPlayCinematicAsync::Activate()
 		return;
 	}
 
-	UWorld* World = GetWorld();
-	if (IsValid(World))
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Name = ContentClass->GetFName();
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnInfo.ObjectFlags = RF_Transient;
+	SpawnInfo.bHideFromSceneOutliner = true;
+	SpawnInfo.CustomPreSpawnInitalization = [this](AActor* SpawnedActor)
 	{
-		PlayableContent = World->SpawnActorDeferred<ACinematicPlayerContent>(ContentClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		if (const auto PlayerContent = CastChecked<ACinematicPlayerContent>(SpawnedActor))
+		{
+			PlayerContent->OnStart.AddDynamic(this, &UPlayCinematicAsync::StartCallback);
+			PlayerContent->OnStop.AddDynamic(this, &UPlayCinematicAsync::StopCallback);
+			PlayerContent->OnFinish.AddDynamic(this, &UPlayCinematicAsync::FinishCallback);
+			PlayerContent->Initialize(PlayerController);
+		}
+	};
 
-		PlayableContent->OnStart.AddDynamic(this, &UPlayCinematicAsync::StartCallback);
-		PlayableContent->OnStop.AddDynamic(this, &UPlayCinematicAsync::StopCallback);
-		PlayableContent->OnFinish.AddDynamic(this, &UPlayCinematicAsync::FinishCallback);
-
-		PlayableContent->Initialize(PlayerController.Get());
-		PlayableContent->FinishSpawning(FTransform::Identity, true);
-	}
+	PlayableContent = World->SpawnActor<ACinematicPlayerContent>(ContentClass, SpawnInfo);
 }
 
 void UPlayCinematicAsync::SetReadyToDestroy()
 {
-	if (IsValid(PlayableContent))
+	if (PlayableContent.IsValid())
 	{
 		PlayableContent->OnStart.RemoveDynamic(this, &UPlayCinematicAsync::StartCallback);
 		PlayableContent->OnStop.RemoveDynamic(this, &UPlayCinematicAsync::StopCallback);
 		PlayableContent->OnFinish.RemoveDynamic(this, &UPlayCinematicAsync::FinishCallback);
 
 		PlayableContent->Destroy();
-		PlayableContent = nullptr;
+		PlayableContent.Reset();
 	}
 
 	Super::SetReadyToDestroy();
