@@ -4,7 +4,9 @@
 
 #include <CoreMinimal.h>
 
+#ifndef FUNC_STR
 #define FUNC_STR StringCast<TCHAR>(__FUNCTION__).Get()
+#endif
 
 CINEMATICPLAYER_API DECLARE_LOG_CATEGORY_EXTERN(LogCinematicPlayer, Log, All);
 CINEMATICPLAYER_API DECLARE_LOG_CATEGORY_EXTERN(LogCinematicPlayerContent, Log, All);
