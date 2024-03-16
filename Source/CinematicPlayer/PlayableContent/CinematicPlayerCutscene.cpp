@@ -27,18 +27,20 @@ void ACinematicPlayerCutscene::BeginPlay()
 		return;
 	}
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.ObjectFlags |= RF_Transient;
-	SpawnParams.bAllowDuringConstructionScript = true;
-	SpawnParams.bDeferConstruction = true; // Defer construction for autoplay so that BeginPlay() is called
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnInfo.ObjectFlags |= RF_Transient;
+	SpawnInfo.Owner = this;
+	SpawnInfo.CustomPreSpawnInitalization = [this](AActor* SpawnedActor)
+	{
+		if (const auto LvlSequenceActor = CastChecked<ALevelSequenceActor>(SpawnedActor))
+		{
+			LvlSequenceActor->SetSequence(LevelSequence);
+			LvlSequenceActor->InitializePlayer();
+		}
+	};
 
-	LevelSequenceActor = World->SpawnActor<ALevelSequenceActor>(LevelSequenceActorClass, SpawnParams);
-	LevelSequenceActor->SetSequence(LevelSequence);
-	LevelSequenceActor->InitializePlayer();
-
-	const FTransform DefaultTransform;
-	LevelSequenceActor->FinishSpawning(DefaultTransform);
+	LevelSequenceActor = World->SpawnActor<ALevelSequenceActor>(LevelSequenceActorClass, SpawnInfo);
 
 	LevelSequencePlayer = LevelSequenceActor->SequencePlayer;
 	if (!LevelSequencePlayer.IsValid())
@@ -61,16 +63,16 @@ void ACinematicPlayerCutscene::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		LevelSequencePlayer->OnPlay.RemoveDynamic(this, &ACinematicPlayerCutscene::OnPlayCallback);
 		LevelSequencePlayer->OnStop.RemoveDynamic(this, &ACinematicPlayerCutscene::OnStopCallback);
 		LevelSequencePlayer->OnFinished.RemoveDynamic(this, &ACinematicPlayerCutscene::OnFinishedCallback);
-
 		LevelSequencePlayer->Stop();
+		LevelSequencePlayer.Reset();
 	}
-
-	LevelSequencePlayer = nullptr;
 
 	if (LevelSequenceActor.IsValid())
 	{
-		LevelSequenceActor->Destroy();
-		LevelSequenceActor = nullptr;
+		LevelSequenceActor->SetSequence(nullptr);
+		LevelSequenceActor->SequencePlayer = nullptr;
+		LevelSequenceActor->Destroy(false, false);
+		LevelSequenceActor.Reset();
 	}
 
 	Super::EndPlay(EndPlayReason);

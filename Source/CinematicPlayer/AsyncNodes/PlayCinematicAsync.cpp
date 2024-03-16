@@ -50,10 +50,8 @@ void UPlayCinematicAsync::Activate()
 	}
 
 	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.Name = ContentClass->GetFName();
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnInfo.ObjectFlags = RF_Transient;
-	SpawnInfo.bHideFromSceneOutliner = true;
 	SpawnInfo.CustomPreSpawnInitalization = [this](AActor* SpawnedActor)
 	{
 		if (const auto PlayerContent = CastChecked<ACinematicPlayerContent>(SpawnedActor))

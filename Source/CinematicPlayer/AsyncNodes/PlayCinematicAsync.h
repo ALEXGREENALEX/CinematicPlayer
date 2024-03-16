@@ -47,10 +47,6 @@ public:
 
 private:
 	TWeakObjectPtr<APlayerController> PlayerController;
-
-	UPROPERTY(Transient)
 	TSoftClassPtr<ACinematicPlayerContent> ContentSoftClass;
-
-	UPROPERTY(Transient)
 	TWeakObjectPtr<ACinematicPlayerContent> PlayableContent;
 };
