@@ -76,7 +76,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer")
 	bool bCanSkip = true;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer", AdvancedDisplay, Meta = (MustImplement = CinematicPlayerInterface))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer", AdvancedDisplay, Meta = (MustImplement = "/Script/CinematicPlayer.CinematicPlayerInterface"))
 	TSubclassOf<UUserWidget> WidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer", AdvancedDisplay)

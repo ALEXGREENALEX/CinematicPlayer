@@ -44,9 +44,6 @@ public:
 	TSubclassOf<ALevelSequenceActor> LevelSequenceActorClass;
 
 private:
-	UPROPERTY(Transient)
 	TWeakObjectPtr<ALevelSequenceActor> LevelSequenceActor;
-
-	UPROPERTY(Transient)
 	TWeakObjectPtr<ULevelSequencePlayer> LevelSequencePlayer;
 };
