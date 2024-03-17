@@ -24,6 +24,12 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	// End AActor overrides
 
+	UFUNCTION(BlueprintPure, Category = "CinematicPlayer")
+	APlayerController* GetPlayerController() const { return OwningPlayerController.Get(); }
+
+	UFUNCTION(BlueprintPure, Category = "CinematicPlayer")
+	UUserWidget* GetPlayerWidget() const { return PlayerWidget.Get(); }
+
 	virtual void OpenAndPlayContent() { ; }
 	virtual void PlaybackStarted();
 	virtual void StopAndDestroy();
@@ -83,9 +89,6 @@ public:
 	int32 WidgetsZOrder = 0;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "CinematicPlayer")
 	TWeakObjectPtr<APlayerController> OwningPlayerController;
-
-	UPROPERTY(BlueprintReadOnly, Category = "CinematicPlayer")
 	TWeakObjectPtr<UUserWidget> PlayerWidget;
 };
