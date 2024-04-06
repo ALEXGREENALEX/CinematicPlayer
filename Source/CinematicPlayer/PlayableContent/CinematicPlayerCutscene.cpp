@@ -8,7 +8,6 @@
 
 ACinematicPlayerCutscene::ACinematicPlayerCutscene(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer),
-	  LevelSequence(nullptr),
 	  LevelSequenceActorClass(ALevelSequenceActor::StaticClass())
 {
 }

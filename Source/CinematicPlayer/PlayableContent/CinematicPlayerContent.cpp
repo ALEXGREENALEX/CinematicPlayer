@@ -1,9 +1,18 @@
 ﻿#include "CinematicPlayerContent.h"
 #include <Blueprint/UserWidget.h>
+#include <EnhancedInputSubsystems.h>
+#include <InputMappingContext.h>
 #include "Logs/CinematicPlayerLogs.h"
 #include "Interfaces/CinematicPlayerInterface.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CinematicPlayerContent)
+
+ACinematicPlayerContent::ACinematicPlayerContent(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	InputMappingOptions.bIgnoreAllPressedKeysUntilRelease = true;
+	InputMappingOptions.bForceImmediately = true; // Need update all before Spawn Widget Hint
+}
 
 void ACinematicPlayerContent::Initialize(TWeakObjectPtr<APlayerController> PlayerController)
 {
@@ -21,18 +30,19 @@ void ACinematicPlayerContent::BeginPlay()
 		return;
 	}
 
-	CreatePlayerWidget();
 	EnableInput(OwningPlayerController.Get()); // Enable receive Input from PlayerController
-	EnableInputMapping(OwningPlayerController.Get()); // Add Input Mapping
+	AddInputMapping();
+	CreatePlayerWidget();
 
 	OpenAndPlayContent();
 }
 
 void ACinematicPlayerContent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	RemoveInputMapping();
+
 	if (OwningPlayerController.IsValid())
 	{
-		DisableInputMapping(OwningPlayerController.Get()); // Remove Input Mapping
 		DisableInput(OwningPlayerController.Get()); // Disable receive Input from PlayerController
 	}
 
@@ -126,4 +136,43 @@ void ACinematicPlayerContent::RemovePlayerWidget()
 	}
 
 	PlayerWidget.Reset();
+}
+
+void ACinematicPlayerContent::AddInputMapping_Implementation()
+{
+	if (!IsValid(InputMappingContext))
+	{
+		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: InputMappingContext is Not Valid!"), FUNC_STR);
+		return;
+	}
+
+	if (!OwningPlayerController.IsValid())
+	{
+		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: OwningPlayerController is Not Valid!"), FUNC_STR);
+		return;
+	}
+
+	const ULocalPlayer* LocalPlayer = OwningPlayerController->GetLocalPlayer();
+	if (!IsValid(LocalPlayer))
+	{
+		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: LocalPlayer is Not Valid!"), FUNC_STR);
+		return;
+	}
+
+	EnhancedInputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	if (!EnhancedInputSubsystem.IsValid())
+	{
+		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: EnhancedInputSubsystem is Not Valid!"), FUNC_STR);
+		return;
+	}
+
+	EnhancedInputSubsystem->AddMappingContext(InputMappingContext, InputMappingPriority, InputMappingOptions);
+}
+
+void ACinematicPlayerContent::RemoveInputMapping_Implementation()
+{
+	if (EnhancedInputSubsystem.IsValid())
+	{
+		EnhancedInputSubsystem->RemoveMappingContext(InputMappingContext, InputMappingOptions);
+	}
 }

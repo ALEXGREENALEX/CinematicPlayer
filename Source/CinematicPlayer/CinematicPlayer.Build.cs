@@ -13,6 +13,7 @@ public class CinematicPlayer : ModuleRules
 			"Core",
 			"CoreUObject",
 			"Engine",
+			"EnhancedInput",
 			"LevelSequence",
 			"MediaAssets",
 			"MovieScene",
