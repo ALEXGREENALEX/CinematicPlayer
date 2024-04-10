@@ -33,7 +33,7 @@ public:
 	APlayerController* GetPlayerController() const { return OwningPlayerController.Get(); }
 
 	UFUNCTION(BlueprintPure, Category = "CinematicPlayer")
-	UUserWidget* GetPlayerWidget() const { return PlayerWidget.Get(); }
+	UUserWidget* GetPlayerWidget() const { return PlayerUserWidget.Get(); }
 
 	virtual void OpenAndPlayContent() { ; }
 	virtual void PlaybackStarted();
@@ -56,9 +56,6 @@ public:
 	void PressSkipKey(bool bPressed);
 
 protected:
-	virtual void CreatePlayerWidget();
-	virtual void RemovePlayerWidget();
-
 	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer|Events")
 	void ReceiveOnStart();
 
@@ -75,6 +72,14 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "CinematicPlayer|Input")
 	void RemoveInputMapping();
 	virtual void RemoveInputMapping_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "CinematicPlayer|UserInterface")
+	UUserWidget* CreatePlayerWidget(APlayerController* PlayerController);
+	virtual UUserWidget* CreatePlayerWidget_Implementation(APlayerController* PlayerController);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "CinematicPlayer|UserInterface")
+	void RemovePlayerWidget(UUserWidget* PlayerWidget);
+	virtual void RemovePlayerWidget_Implementation(UUserWidget* PlayerWidget);
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -107,5 +112,5 @@ public:
 protected:
 	TWeakObjectPtr<APlayerController> OwningPlayerController;
 	TWeakObjectPtr<UEnhancedInputLocalPlayerSubsystem> EnhancedInputSubsystem;
-	TWeakObjectPtr<UUserWidget> PlayerWidget;
+	TWeakObjectPtr<UUserWidget> PlayerUserWidget;
 };

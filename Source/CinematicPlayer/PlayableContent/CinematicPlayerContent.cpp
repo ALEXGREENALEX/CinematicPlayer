@@ -32,7 +32,8 @@ void ACinematicPlayerContent::BeginPlay()
 
 	EnableInput(OwningPlayerController.Get()); // Enable receive Input from PlayerController
 	AddInputMapping();
-	CreatePlayerWidget();
+
+	PlayerUserWidget = CreatePlayerWidget(OwningPlayerController.Get());
 
 	OpenAndPlayContent();
 }
@@ -46,7 +47,8 @@ void ACinematicPlayerContent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		DisableInput(OwningPlayerController.Get()); // Disable receive Input from PlayerController
 	}
 
-	RemovePlayerWidget();
+	RemovePlayerWidget(PlayerUserWidget.Get());
+	PlayerUserWidget.Reset();
 
 	Super::EndPlay(EndPlayReason);
 }
@@ -60,9 +62,9 @@ void ACinematicPlayerContent::PlaybackStarted()
 		OnStart.Broadcast();
 	}
 
-	if (PlayerWidget.IsValid())
+	if (PlayerUserWidget.IsValid())
 	{
-		ICinematicPlayerInterface::Execute_Start(PlayerWidget.Get());
+		ICinematicPlayerInterface::Execute_Start(PlayerUserWidget.Get());
 	}
 }
 
@@ -92,50 +94,18 @@ void ACinematicPlayerContent::FinishAndDestroy()
 
 void ACinematicPlayerContent::PressAnyKey(bool bPressed)
 {
-	if (PlayerWidget.IsValid())
+	if (PlayerUserWidget.IsValid())
 	{
-		ICinematicPlayerInterface::Execute_AnyKeyPressed(PlayerWidget.Get(), bPressed);
+		ICinematicPlayerInterface::Execute_AnyKeyPressed(PlayerUserWidget.Get(), bPressed);
 	}
 }
 
 void ACinematicPlayerContent::PressSkipKey(bool bPressed)
 {
-	if (PlayerWidget.IsValid())
+	if (PlayerUserWidget.IsValid())
 	{
-		ICinematicPlayerInterface::Execute_SkipKeyPressed(PlayerWidget.Get(), bPressed);
+		ICinematicPlayerInterface::Execute_SkipKeyPressed(PlayerUserWidget.Get(), bPressed);
 	}
-}
-
-void ACinematicPlayerContent::CreatePlayerWidget()
-{
-	if (!OwningPlayerController.IsValid())
-	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: OwningPlayerController is Not Valid!"), FUNC_STR);
-		return;
-	}
-
-	if (!WidgetClass->ImplementsInterface(UCinematicPlayerInterface::StaticClass()))
-	{
-		UE_LOG(LogCinematicPlayerContent, Warning, TEXT("%s :: WidgetClass class must implement CinematicPlayerInterface!"), FUNC_STR);
-		return;
-	}
-
-	PlayerWidget = CreateWidget(OwningPlayerController.Get(), WidgetClass);
-	if (PlayerWidget.IsValid())
-	{
-		ICinematicPlayerInterface::Execute_Initialize(PlayerWidget.Get(), this);
-		PlayerWidget->AddToViewport(WidgetsZOrder);
-	}
-}
-
-void ACinematicPlayerContent::RemovePlayerWidget()
-{
-	if (PlayerWidget.IsValid())
-	{
-		ICinematicPlayerInterface::Execute_HideAndDestroy(PlayerWidget.Get());
-	}
-
-	PlayerWidget.Reset();
 }
 
 void ACinematicPlayerContent::AddInputMapping_Implementation()
@@ -174,5 +144,45 @@ void ACinematicPlayerContent::RemoveInputMapping_Implementation()
 	if (EnhancedInputSubsystem.IsValid())
 	{
 		EnhancedInputSubsystem->RemoveMappingContext(InputMappingContext, InputMappingOptions);
+	}
+}
+
+UUserWidget* ACinematicPlayerContent::CreatePlayerWidget_Implementation(APlayerController* PlayerController)
+{
+	if (!IsValid(PlayerController))
+	{
+		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: PlayerController is Not Valid!"), FUNC_STR);
+		return nullptr;
+	}
+
+	if (!IsValid(WidgetClass))
+	{
+		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: WidgetClass is Not Valid!"), FUNC_STR);
+		return nullptr;
+	}
+
+	if (!WidgetClass->ImplementsInterface(UCinematicPlayerInterface::StaticClass()))
+	{
+		UE_LOG(LogCinematicPlayerContent, Warning, TEXT("%s :: WidgetClass class must implement CinematicPlayerInterface!"), FUNC_STR);
+		return nullptr;
+	}
+
+	UUserWidget* PlayerWidget = CreateWidget(OwningPlayerController.Get(), WidgetClass);
+	if (!IsValid(PlayerWidget))
+	{
+		UE_LOG(LogCinematicPlayerContent, Warning, TEXT("%s :: Can't create PlayerWidget!"), FUNC_STR);
+		return nullptr;
+	}
+
+	ICinematicPlayerInterface::Execute_Initialize(PlayerWidget, this);
+	PlayerWidget->AddToViewport(WidgetsZOrder);
+	return PlayerWidget;
+}
+
+void ACinematicPlayerContent::RemovePlayerWidget_Implementation(UUserWidget* PlayerWidget)
+{
+	if (IsValid(PlayerWidget))
+	{
+		ICinematicPlayerInterface::Execute_HideAndDestroy(PlayerWidget);
 	}
 }
