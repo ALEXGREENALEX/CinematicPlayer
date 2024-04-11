@@ -17,7 +17,7 @@ class CINEMATICPLAYER_API ICinematicPlayerInterface
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CinematicPlayer")
-	void Initialize(ACinematicPlayerContent* PlayableContent);
+	void Initialize(bool bCanSkip, ACinematicPlayerContent* PlayableContent);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "CinematicPlayer")
 	void Start();

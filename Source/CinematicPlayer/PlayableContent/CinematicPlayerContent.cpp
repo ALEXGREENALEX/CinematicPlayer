@@ -174,7 +174,7 @@ UUserWidget* ACinematicPlayerContent::CreatePlayerWidget_Implementation(APlayerC
 		return nullptr;
 	}
 
-	ICinematicPlayerInterface::Execute_Initialize(PlayerWidget, this);
+	ICinematicPlayerInterface::Execute_Initialize(PlayerWidget, bCanSkip, this);
 	PlayerWidget->AddToViewport(WidgetsZOrder);
 	return PlayerWidget;
 }
