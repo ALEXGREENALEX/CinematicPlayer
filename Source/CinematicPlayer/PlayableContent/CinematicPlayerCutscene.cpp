@@ -1,4 +1,5 @@
 ﻿#include "CinematicPlayerCutscene.h"
+#include <Containers/Ticker.h>
 #include <Engine/World.h>
 #include <LevelSequenceActor.h>
 #include <LevelSequencePlayer.h>
@@ -32,44 +33,38 @@ void ACinematicPlayerCutscene::BeginPlay()
 	SpawnInfo.Owner = this;
 	SpawnInfo.CustomPreSpawnInitalization = [this](AActor* SpawnedActor)
 	{
-		if (const auto LvlSequenceActor = CastChecked<ALevelSequenceActor>(SpawnedActor))
+		if (ALevelSequenceActor* SequenceActor = CastChecked<ALevelSequenceActor>(SpawnedActor))
 		{
-			LvlSequenceActor->SetSequence(LevelSequence);
-			LvlSequenceActor->InitializePlayer();
+			ULevelSequencePlayer* SequencePlayer = SequenceActor->GetSequencePlayer();
+			if (IsValid(SequencePlayer))
+			{
+				SequencePlayer->OnPlay.AddDynamic(this, &ACinematicPlayerCutscene::OnPlayCallback);
+				SequencePlayer->OnFinished.AddDynamic(this, &ACinematicPlayerCutscene::OnFinishedCallback);
+			}
+
+			SequenceActor->SetSequence(LevelSequence);
+			SequenceActor->InitializePlayer();
 		}
 	};
 
 	LevelSequenceActor = World->SpawnActor<ALevelSequenceActor>(LevelSequenceActorClass, SpawnInfo);
-
-	LevelSequencePlayer = LevelSequenceActor->SequencePlayer;
-	if (!LevelSequencePlayer.IsValid())
-	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: LevelSequencePlayer is Not Valid!"), FUNC_STR);
-		Destroy();
-		return;
-	}
-
-	LevelSequencePlayer->OnPlay.AddDynamic(this, &ACinematicPlayerCutscene::OnPlayCallback);
-	LevelSequencePlayer->OnFinished.AddDynamic(this, &ACinematicPlayerCutscene::OnFinishedCallback);
 
 	Super::BeginPlay();
 }
 
 void ACinematicPlayerCutscene::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (LevelSequencePlayer.IsValid())
-	{
-		LevelSequencePlayer->OnPlay.RemoveDynamic(this, &ACinematicPlayerCutscene::OnPlayCallback);
-		LevelSequencePlayer->OnStop.RemoveDynamic(this, &ACinematicPlayerCutscene::OnStopCallback);
-		LevelSequencePlayer->OnFinished.RemoveDynamic(this, &ACinematicPlayerCutscene::OnFinishedCallback);
-		LevelSequencePlayer->Stop();
-		LevelSequencePlayer.Reset();
-	}
-
 	if (LevelSequenceActor.IsValid())
 	{
-		LevelSequenceActor->SetSequence(nullptr);
-		LevelSequenceActor->SequencePlayer = nullptr;
+		ULevelSequencePlayer* SequencePlayer = LevelSequenceActor->GetSequencePlayer();
+		if (IsValid(SequencePlayer))
+		{
+			SequencePlayer->OnPlay.RemoveDynamic(this, &ACinematicPlayerCutscene::OnPlayCallback);
+			SequencePlayer->OnStop.RemoveDynamic(this, &ACinematicPlayerCutscene::OnStopCallback);
+			SequencePlayer->OnFinished.RemoveDynamic(this, &ACinematicPlayerCutscene::OnFinishedCallback);
+			SequencePlayer->Stop();
+		}
+
 		LevelSequenceActor->Destroy(false, false);
 		LevelSequenceActor.Reset();
 	}
@@ -79,54 +74,84 @@ void ACinematicPlayerCutscene::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void ACinematicPlayerCutscene::OpenAndPlayContent()
 {
-	if (LevelSequencePlayer.IsValid())
+	if (LevelSequenceActor.IsValid())
 	{
-		LevelSequencePlayer->Play();
+		ULevelSequencePlayer* SequencePlayer = LevelSequenceActor->GetSequencePlayer();
+		if (IsValid(SequencePlayer) && SequencePlayer->IsValid())
+		{
+			SequencePlayer->Play();
+		}
 	}
 }
 
 void ACinematicPlayerCutscene::Stop()
 {
-	if (LevelSequencePlayer.IsValid())
+	if (LevelSequenceActor.IsValid())
 	{
-		LevelSequencePlayer->OnFinished.RemoveDynamic(this, &ACinematicPlayerCutscene::OnFinishedCallback);
-		LevelSequencePlayer->OnStop.AddDynamic(this, &ACinematicPlayerCutscene::OnStopCallback);
-		LevelSequencePlayer->Stop();
+		ULevelSequencePlayer* SequencePlayer = LevelSequenceActor->GetSequencePlayer();
+		if (IsValid(SequencePlayer) && SequencePlayer->IsValid())
+		{
+			SequencePlayer->OnFinished.RemoveDynamic(this, &ACinematicPlayerCutscene::OnFinishedCallback);
+			SequencePlayer->OnStop.AddDynamic(this, &ACinematicPlayerCutscene::OnStopCallback);
+			SequencePlayer->Stop();
+		}
 	}
 }
 
 void ACinematicPlayerCutscene::Pause()
 {
-	if (LevelSequencePlayer.IsValid() && LevelSequencePlayer->IsPlaying())
+	if (LevelSequenceActor.IsValid())
 	{
-		LevelSequencePlayer->Pause();
+		ULevelSequencePlayer* SequencePlayer = LevelSequenceActor->GetSequencePlayer();
+		if (IsValid(SequencePlayer) && SequencePlayer->IsValid() && SequencePlayer->IsPlaying())
+		{
+			SequencePlayer->Pause();
+		}
 	}
 }
 
 void ACinematicPlayerCutscene::Resume()
 {
-	if (LevelSequencePlayer.IsValid() && LevelSequencePlayer->IsPaused())
+	if (LevelSequenceActor.IsValid())
 	{
-		LevelSequencePlayer->Play();
+		ULevelSequencePlayer* SequencePlayer = LevelSequenceActor->GetSequencePlayer();
+		if (IsValid(SequencePlayer) && SequencePlayer->IsValid() && SequencePlayer->IsPaused())
+		{
+			SequencePlayer->Play();
+		}
 	}
 }
 
 void ACinematicPlayerCutscene::OnPlayCallback()
 {
-	if (LevelSequencePlayer.IsValid())
+	if (LevelSequenceActor.IsValid())
 	{
-		LevelSequencePlayer->OnPlay.RemoveDynamic(this, &ACinematicPlayerCutscene::OnPlayCallback);
-	}
+		ULevelSequencePlayer* SequencePlayer = LevelSequenceActor->GetSequencePlayer();
+		if (IsValid(SequencePlayer) && SequencePlayer->IsValid())
+		{
+			SequencePlayer->OnPlay.RemoveDynamic(this, &ACinematicPlayerCutscene::OnPlayCallback);
+		}
 
-	PlaybackStarted();
+		PlaybackStarted();
+	}
 }
 
 void ACinematicPlayerCutscene::OnStopCallback()
 {
-	StopAndDestroy();
+	// Delay until next frame (Can't Destroy LevelSequenceActor before RunLatentActions() will be called in UMovieSceneSequencePlayer)
+	FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateWeakLambda(this, [this](float InDelta)
+	{
+		StopAndDestroy();
+		return false;
+	}));
 }
 
 void ACinematicPlayerCutscene::OnFinishedCallback()
 {
-	FinishAndDestroy();
+	// Delay until next frame (Can't Destroy LevelSequenceActor before RunLatentActions() will be called in UMovieSceneSequencePlayer)
+	FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateWeakLambda(this, [this](float InDelta)
+	{
+		FinishAndDestroy();
+		return false;
+	}));
 }

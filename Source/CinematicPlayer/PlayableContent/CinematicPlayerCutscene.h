@@ -6,7 +6,6 @@
 
 class ULevelSequence;
 class ALevelSequenceActor;
-class ULevelSequencePlayer;
 
 UCLASS(Abstract, HideDropdown, Blueprintable)
 class CINEMATICPLAYER_API ACinematicPlayerCutscene : public ACinematicPlayerContent
@@ -45,5 +44,4 @@ public:
 
 private:
 	TWeakObjectPtr<ALevelSequenceActor> LevelSequenceActor;
-	TWeakObjectPtr<ULevelSequencePlayer> LevelSequencePlayer;
 };

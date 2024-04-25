@@ -77,7 +77,7 @@ void ACinematicPlayerContent::StopAndDestroy()
 		OnStop.Broadcast();
 	}
 
-	Destroy();
+	Destroy(false, false);
 }
 
 void ACinematicPlayerContent::FinishAndDestroy()
@@ -89,7 +89,7 @@ void ACinematicPlayerContent::FinishAndDestroy()
 		OnFinish.Broadcast();
 	}
 
-	Destroy();
+	Destroy(false, false);
 }
 
 void ACinematicPlayerContent::PressAnyKey(bool bPressed)
