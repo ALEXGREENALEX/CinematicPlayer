@@ -37,8 +37,8 @@ public:
 
 	virtual void OpenAndPlayContent() { ; }
 	virtual void PlaybackStarted();
-	virtual void StopAndDestroy();
-	virtual void FinishAndDestroy();
+	virtual void PlaybackStopped();
+	virtual void PlaybackFinished();
 
 	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", DisplayName = "Stop (Skip)")
 	virtual void Stop() { ; }

@@ -46,7 +46,8 @@ void ACinematicPlayerMovie::OpenAndPlayContent()
 	if (!IsValid(MediaPlayer) || !IsValid(MediaFile) || !MediaPlayer->OpenSource(MediaFile))
 	{
 		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: Can't Play MediaFile!"), FUNC_STR);
-		StopAndDestroy();
+		PlaybackStopped();
+		Destroy(false, false);
 	}
 }
 
@@ -92,21 +93,25 @@ void ACinematicPlayerMovie::OnMediaOpened(FString OpenedUrl)
 	}
 	else // On some Error
 	{
-		StopAndDestroy();
+		PlaybackStopped();
+		Destroy(false, false);
 	}
 }
 
 void ACinematicPlayerMovie::OnMediaOpenFailed(FString FailedUrl)
 {
-	StopAndDestroy();
+	PlaybackStopped();
+	Destroy(false, false);
 }
 
 void ACinematicPlayerMovie::OnMediaClosed()
 {
-	StopAndDestroy();
+	PlaybackStopped();
+	Destroy(false, false);
 }
 
 void ACinematicPlayerMovie::OnEndReached()
 {
-	FinishAndDestroy();
+	PlaybackFinished();
+	Destroy(false, false);
 }

@@ -138,20 +138,24 @@ void ACinematicPlayerCutscene::OnPlayCallback()
 
 void ACinematicPlayerCutscene::OnStopCallback()
 {
+	PlaybackStopped();
+
 	// Delay until next frame (Can't Destroy LevelSequenceActor before RunLatentActions() will be called in UMovieSceneSequencePlayer)
 	FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateWeakLambda(this, [this](float InDelta)
 	{
-		StopAndDestroy();
+		Destroy(false, false);
 		return false;
 	}));
 }
 
 void ACinematicPlayerCutscene::OnFinishedCallback()
 {
+	PlaybackFinished();
+
 	// Delay until next frame (Can't Destroy LevelSequenceActor before RunLatentActions() will be called in UMovieSceneSequencePlayer)
 	FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateWeakLambda(this, [this](float InDelta)
 	{
-		FinishAndDestroy();
+		Destroy(false, false);
 		return false;
 	}));
 }

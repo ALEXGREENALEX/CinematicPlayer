@@ -68,7 +68,7 @@ void ACinematicPlayerContent::PlaybackStarted()
 	}
 }
 
-void ACinematicPlayerContent::StopAndDestroy()
+void ACinematicPlayerContent::PlaybackStopped()
 {
 	ReceiveOnStop();
 
@@ -76,11 +76,9 @@ void ACinematicPlayerContent::StopAndDestroy()
 	{
 		OnStop.Broadcast();
 	}
-
-	Destroy(false, false);
 }
 
-void ACinematicPlayerContent::FinishAndDestroy()
+void ACinematicPlayerContent::PlaybackFinished()
 {
 	ReceiveOnFinish();
 
@@ -88,8 +86,6 @@ void ACinematicPlayerContent::FinishAndDestroy()
 	{
 		OnFinish.Broadcast();
 	}
-
-	Destroy(false, false);
 }
 
 void ACinematicPlayerContent::PressAnyKey(bool bPressed)
