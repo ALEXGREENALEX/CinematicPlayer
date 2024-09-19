@@ -73,13 +73,48 @@ void UPlayCinematicAsync::SetReadyToDestroy()
 		PlayableContent->OnStart.RemoveDynamic(this, &UPlayCinematicAsync::StartCallback);
 		PlayableContent->OnStop.RemoveDynamic(this, &UPlayCinematicAsync::StopCallback);
 		PlayableContent->OnFinish.RemoveDynamic(this, &UPlayCinematicAsync::FinishCallback);
-
-		PlayableContent->Destroy();
+		// PlayableContent will destroy themselves later. If we try to Destroy it, ensure will occur!
 		PlayableContent.Reset();
 	}
 
 	Super::SetReadyToDestroy();
 }
+
+#pragma region PlayableContent
+APlayerController* UPlayCinematicAsync::GetPlayerController() const
+{
+	return PlayableContent.IsValid() ? PlayableContent->GetPlayerController() : nullptr;
+}
+
+UUserWidget* UPlayCinematicAsync::GetPlayerWidget() const
+{
+	return PlayableContent.IsValid() ? PlayableContent->GetPlayerWidget() : nullptr;
+}
+
+void UPlayCinematicAsync::Stop()
+{
+	if (PlayableContent.IsValid())
+	{
+		PlayableContent->Stop();
+	}
+}
+
+void UPlayCinematicAsync::Pause()
+{
+	if (PlayableContent.IsValid())
+	{
+		PlayableContent->Pause();
+	}
+}
+
+void UPlayCinematicAsync::Resume()
+{
+	if (PlayableContent.IsValid())
+	{
+		PlayableContent->Resume();
+	}
+}
+#pragma endregion PlayableContent
 
 void UPlayCinematicAsync::StartCallback()
 {

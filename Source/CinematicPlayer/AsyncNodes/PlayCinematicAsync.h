@@ -14,13 +14,33 @@ class CINEMATICPLAYER_API UPlayCinematicAsync : public UBlueprintAsyncActionBase
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", Meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"))
+	static UPlayCinematicAsync* PlayCinematicAsync(UObject* WorldContextObject, APlayerController* PlayerController, TSoftClassPtr<ACinematicPlayerContent> Content);
+
 	// Begin UBlueprintAsyncActionBase interface
 	virtual void Activate() override;
 	virtual void SetReadyToDestroy() override;
 	// End UBlueprintAsyncActionBase interface
 
-	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", Meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"))
-	static UPlayCinematicAsync* PlayCinematicAsync(UObject* WorldContextObject, APlayerController* PlayerController, TSoftClassPtr<ACinematicPlayerContent> Content);
+#pragma region PlayableContent
+	UFUNCTION(BlueprintPure, Category = "CinematicPlayer")
+	ACinematicPlayerContent* GetPlayableContent() const { return PlayableContent.Get(); }
+
+	UFUNCTION(BlueprintPure, Category = "CinematicPlayer")
+	APlayerController* GetPlayerController() const;
+
+	UFUNCTION(BlueprintPure, Category = "CinematicPlayer")
+	UUserWidget* GetPlayerWidget() const;
+
+	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", DisplayName = "Stop (Skip)")
+	virtual void Stop();
+
+	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer")
+	virtual void Pause();
+
+	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer")
+	virtual void Resume();
+#pragma endregion PlayableContent
 
 private:
 	UFUNCTION()
