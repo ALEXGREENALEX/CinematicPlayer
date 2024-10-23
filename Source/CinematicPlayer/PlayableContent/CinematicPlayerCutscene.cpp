@@ -17,7 +17,7 @@ void ACinematicPlayerCutscene::BeginPlay()
 {
 	if (!IsValid(LevelSequence))
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: LevelSequence is Not Valid!"), FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayerContent, Error, "[{FUNC}] LevelSequence is Not Valid!", FUNC_STR);
 		return;
 	}
 

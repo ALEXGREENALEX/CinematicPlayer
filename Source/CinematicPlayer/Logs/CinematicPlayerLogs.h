@@ -3,6 +3,7 @@
 #pragma once
 
 #include <CoreMinimal.h>
+#include <Logging/StructuredLog.h>
 
 #ifndef FUNC_STR
 #define FUNC_STR StringCast<TCHAR>(__FUNCTION__).Get()

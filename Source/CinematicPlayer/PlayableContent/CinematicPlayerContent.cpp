@@ -25,7 +25,7 @@ void ACinematicPlayerContent::BeginPlay()
 
 	if (!OwningPlayerController.IsValid())
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: OwningPlayerController is Not Valid!"), FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayerContent, Error, "[{FUNC}] OwningPlayerController is Not Valid!", FUNC_STR);
 		Destroy();
 		return;
 	}
@@ -108,27 +108,27 @@ void ACinematicPlayerContent::AddInputMapping_Implementation()
 {
 	if (!IsValid(InputMappingContext))
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: InputMappingContext is Not Valid!"), FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayerContent, Error, "[{FUNC}] InputMappingContext is Not Valid!", FUNC_STR);
 		return;
 	}
 
 	if (!OwningPlayerController.IsValid())
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: OwningPlayerController is Not Valid!"), FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayerContent, Error, "[{FUNC}] OwningPlayerController is Not Valid!", FUNC_STR);
 		return;
 	}
 
 	const ULocalPlayer* LocalPlayer = OwningPlayerController->GetLocalPlayer();
 	if (!IsValid(LocalPlayer))
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: LocalPlayer is Not Valid!"), FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayerContent, Error, "[{FUNC}] LocalPlayer is Not Valid!", FUNC_STR);
 		return;
 	}
 
 	EnhancedInputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
 	if (!EnhancedInputSubsystem.IsValid())
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: EnhancedInputSubsystem is Not Valid!"), FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayerContent, Error, "[{FUNC}] EnhancedInputSubsystem is Not Valid!", FUNC_STR);
 		return;
 	}
 
@@ -147,26 +147,26 @@ UUserWidget* ACinematicPlayerContent::CreatePlayerWidget_Implementation(APlayerC
 {
 	if (!IsValid(PlayerController))
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: PlayerController is Not Valid!"), FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayerContent, Error, "[{FUNC}] PlayerController is Not Valid!", FUNC_STR);
 		return nullptr;
 	}
 
 	if (!IsValid(WidgetClass))
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: WidgetClass is Not Valid!"), FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayerContent, Error, "[{FUNC}] WidgetClass is Not Valid!", FUNC_STR);
 		return nullptr;
 	}
 
 	if (!WidgetClass->ImplementsInterface(UCinematicPlayerInterface::StaticClass()))
 	{
-		UE_LOG(LogCinematicPlayerContent, Warning, TEXT("%s :: WidgetClass class must implement CinematicPlayerInterface!"), FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayerContent, Warning, "[{FUNC}] WidgetClass class must implement CinematicPlayerInterface!", FUNC_STR);
 		return nullptr;
 	}
 
 	UUserWidget* PlayerWidget = CreateWidget(OwningPlayerController.Get(), WidgetClass);
 	if (!IsValid(PlayerWidget))
 	{
-		UE_LOG(LogCinematicPlayerContent, Warning, TEXT("%s :: Can't create PlayerWidget!"), FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayerContent, Warning, "[{FUNC}] Can't create PlayerWidget!", FUNC_STR);
 		return nullptr;
 	}
 

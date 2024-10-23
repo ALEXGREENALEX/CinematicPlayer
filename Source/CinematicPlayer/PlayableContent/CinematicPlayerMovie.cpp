@@ -10,7 +10,7 @@ void ACinematicPlayerMovie::BeginPlay()
 {
 	if (!IsValid(MediaPlayer))
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: MediaPlayer is Not Valid!"), FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayerContent, Error, "[{FUNC}] MediaPlayer is Not Valid!", FUNC_STR);
 		Destroy();
 		return;
 	}
@@ -45,7 +45,7 @@ void ACinematicPlayerMovie::OpenAndPlayContent()
 {
 	if (!IsValid(MediaPlayer) || !IsValid(MediaFile) || !MediaPlayer->OpenSource(MediaFile))
 	{
-		UE_LOG(LogCinematicPlayerContent, Error, TEXT("%s :: Can't Play MediaFile!"), FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayerContent, Error, "[{FUNC}] Can't Play MediaFile!", FUNC_STR);
 		PlaybackStopped();
 		Destroy(false, false);
 	}
