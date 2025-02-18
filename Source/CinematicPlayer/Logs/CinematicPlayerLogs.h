@@ -1,4 +1,4 @@
-﻿// Copyright 2024 Alex Zelenskyi. All Rights Reserved.
+﻿// Copyright 2023 - 2025 Olexandr Zelenskyi. All Rights Reserved.
 
 #pragma once
 
@@ -10,4 +10,3 @@
 #endif
 
 CINEMATICPLAYER_API DECLARE_LOG_CATEGORY_EXTERN(LogCinematicPlayer, Log, All);
-CINEMATICPLAYER_API DECLARE_LOG_CATEGORY_EXTERN(LogCinematicPlayerContent, Log, All);

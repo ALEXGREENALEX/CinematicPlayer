@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// Copyright 2023 - 2025 Olexandr Zelenskyi. All Rights Reserved.
+
+#pragma once
 
 #include <CoreMinimal.h>
 #include <Kismet/BlueprintAsyncActionBase.h>
@@ -14,6 +16,7 @@ class CINEMATICPLAYER_API UPlayCinematicAsync : public UBlueprintAsyncActionBase
 	GENERATED_BODY()
 
 public:
+	// Allow to play Cinematic Content like Movies and Level Sequences Async.
 	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", Meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"))
 	static UPlayCinematicAsync* PlayCinematicAsync(UObject* WorldContextObject, APlayerController* PlayerController, TSoftClassPtr<ACinematicPlayerContent> Content);
 

@@ -1,4 +1,6 @@
-﻿#include "CinematicPlayerMovie.h"
+﻿// Copyright 2023 - 2025 Olexandr Zelenskyi. All Rights Reserved.
+
+#include "CinematicPlayerMovie.h"
 #include <GameFramework/PlayerController.h>
 #include <FileMediaSource.h>
 #include <MediaPlayer.h>
@@ -10,7 +12,7 @@ void ACinematicPlayerMovie::BeginPlay()
 {
 	if (!IsValid(MediaPlayer))
 	{
-		UE_LOGFMT(LogCinematicPlayerContent, Error, "[{FUNC}] MediaPlayer is Not Valid!", FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] MediaPlayer is Not Valid!", FUNC_STR);
 		Destroy();
 		return;
 	}
@@ -18,10 +20,10 @@ void ACinematicPlayerMovie::BeginPlay()
 	MediaPlayer->PlayOnOpen = false;
 	MediaPlayer->SetLooping(false);
 
-	MediaPlayer->OnMediaOpened.AddDynamic(this, &ACinematicPlayerMovie::OnMediaOpened);
-	MediaPlayer->OnMediaOpenFailed.AddDynamic(this, &ACinematicPlayerMovie::OnMediaOpenFailed);
-	MediaPlayer->OnMediaClosed.AddDynamic(this, &ACinematicPlayerMovie::OnMediaClosed);
-	MediaPlayer->OnEndReached.AddDynamic(this, &ACinematicPlayerMovie::OnEndReached);
+	MediaPlayer->OnMediaOpened.AddDynamic(this, &ACinematicPlayerMovie::OnMediaOpened_Callback);
+	MediaPlayer->OnMediaOpenFailed.AddDynamic(this, &ACinematicPlayerMovie::OnMediaOpenFailed_Callback);
+	MediaPlayer->OnMediaClosed.AddDynamic(this, &ACinematicPlayerMovie::OnMediaClosed_Callback);
+	MediaPlayer->OnEndReached.AddDynamic(this, &ACinematicPlayerMovie::OnEndReached_Callback);
 
 	Super::BeginPlay();
 }
@@ -30,10 +32,10 @@ void ACinematicPlayerMovie::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (IsValid(MediaPlayer))
 	{
-		MediaPlayer->OnMediaOpened.RemoveDynamic(this, &ACinematicPlayerMovie::OnMediaOpened);
-		MediaPlayer->OnMediaOpenFailed.RemoveDynamic(this, &ACinematicPlayerMovie::OnMediaOpenFailed);
-		MediaPlayer->OnMediaClosed.RemoveDynamic(this, &ACinematicPlayerMovie::OnMediaClosed);
-		MediaPlayer->OnEndReached.RemoveDynamic(this, &ACinematicPlayerMovie::OnEndReached);
+		MediaPlayer->OnMediaOpened.RemoveDynamic(this, &ACinematicPlayerMovie::OnMediaOpened_Callback);
+		MediaPlayer->OnMediaOpenFailed.RemoveDynamic(this, &ACinematicPlayerMovie::OnMediaOpenFailed_Callback);
+		MediaPlayer->OnMediaClosed.RemoveDynamic(this, &ACinematicPlayerMovie::OnMediaClosed_Callback);
+		MediaPlayer->OnEndReached.RemoveDynamic(this, &ACinematicPlayerMovie::OnEndReached_Callback);
 
 		MediaPlayer->Close();
 	}
@@ -45,9 +47,8 @@ void ACinematicPlayerMovie::OpenAndPlayContent()
 {
 	if (!IsValid(MediaPlayer) || !IsValid(MediaFile) || !MediaPlayer->OpenSource(MediaFile))
 	{
-		UE_LOGFMT(LogCinematicPlayerContent, Error, "[{FUNC}] Can't Play MediaFile!", FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] Can't Play MediaFile!", FUNC_STR);
 		PlaybackStopped();
-		Destroy(false, false);
 	}
 }
 
@@ -80,7 +81,7 @@ void ACinematicPlayerMovie::Resume()
 	}
 }
 
-void ACinematicPlayerMovie::OnMediaOpened(FString OpenedUrl)
+void ACinematicPlayerMovie::OnMediaOpened_Callback(FString OpenedUrl)
 {
 	if (IsValid(MediaPlayer))
 	{
@@ -94,24 +95,20 @@ void ACinematicPlayerMovie::OnMediaOpened(FString OpenedUrl)
 	else // On some Error
 	{
 		PlaybackStopped();
-		Destroy(false, false);
 	}
 }
 
-void ACinematicPlayerMovie::OnMediaOpenFailed(FString FailedUrl)
+void ACinematicPlayerMovie::OnMediaOpenFailed_Callback(FString FailedUrl)
 {
 	PlaybackStopped();
-	Destroy(false, false);
 }
 
-void ACinematicPlayerMovie::OnMediaClosed()
+void ACinematicPlayerMovie::OnMediaClosed_Callback()
 {
 	PlaybackStopped();
-	Destroy(false, false);
 }
 
-void ACinematicPlayerMovie::OnEndReached()
+void ACinematicPlayerMovie::OnEndReached_Callback()
 {
 	PlaybackFinished();
-	Destroy(false, false);
 }

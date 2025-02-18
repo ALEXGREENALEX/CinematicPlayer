@@ -1,17 +1,22 @@
-﻿#pragma once
+﻿// Copyright 2023 - 2025 Olexandr Zelenskyi. All Rights Reserved.
+
+#pragma once
 
 #include <UObject/Interface.h>
-#include "CinematicPlayerInterface.generated.h"
+#include "CinematicPlayerWidgetInterface.generated.h"
 
 class ACinematicPlayerContent;
 
+/**
+ * CinematicPlayer Widget Interface.
+ */
 UINTERFACE(MinimalAPI, Blueprintable)
-class UCinematicPlayerInterface : public UInterface
+class UCinematicPlayerWidgetInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
-class CINEMATICPLAYER_API ICinematicPlayerInterface
+class CINEMATICPLAYER_API ICinematicPlayerWidgetInterface
 {
 	GENERATED_BODY()
 

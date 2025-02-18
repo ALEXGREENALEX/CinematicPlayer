@@ -1,4 +1,6 @@
-﻿#include "PlayCinematicAsync.h"
+﻿// Copyright 2023 - 2025 Olexandr Zelenskyi. All Rights Reserved.
+
+#include "PlayCinematicAsync.h"
 #include <Engine/World.h>
 #include <GameFramework/PlayerController.h>
 #include "Logs/CinematicPlayerLogs.h"

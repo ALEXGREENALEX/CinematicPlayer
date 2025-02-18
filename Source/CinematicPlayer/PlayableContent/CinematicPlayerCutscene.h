@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// Copyright 2023 - 2025 Olexandr Zelenskyi. All Rights Reserved.
+
+#pragma once
 
 #include "CinematicPlayerContent.h"
 #include <Templates/SubclassOf.h>
@@ -7,33 +9,39 @@
 class ULevelSequence;
 class ALevelSequenceActor;
 
+/**
+ * Allow to play Cutscenes (Level Sequences).
+ */
 UCLASS(Abstract, HideDropdown, Blueprintable)
 class CINEMATICPLAYER_API ACinematicPlayerCutscene : public ACinematicPlayerContent
 {
 	GENERATED_BODY()
 
 public:
-	ACinematicPlayerCutscene(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	ACinematicPlayerCutscene(const FObjectInitializer& ObjectInitializer);
 
 	// Begin ACinematicPlayerContent overrides
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	virtual void OpenAndPlayContent() override;
 	virtual void Stop() override;
 	virtual void Pause() override;
 	virtual void Resume() override;
+
+protected:
+	virtual void OpenAndPlayContent() override;
+	virtual void RequestDestroy() override;
 	// End ACinematicPlayerContent overrides
 
 private:
 	UFUNCTION()
-	void OnPlayCallback();
+	void OnPlay_Callback();
 
 	UFUNCTION()
-	void OnStopCallback();
+	void OnStop_Callback();
 
 	UFUNCTION()
-	void OnFinishedCallback();
+	void OnFinished_Callback();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer")

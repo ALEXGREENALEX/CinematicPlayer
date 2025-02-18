@@ -1,6 +1,5 @@
-﻿// Copyright 2024 Alex Zelenskyi. All Rights Reserved.
+﻿// Copyright 2023 - 2025 Olexandr Zelenskyi. All Rights Reserved.
 
 #include "CinematicPlayerLogs.h"
 
 DEFINE_LOG_CATEGORY(LogCinematicPlayer);
-DEFINE_LOG_CATEGORY(LogCinematicPlayerContent);

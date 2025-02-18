@@ -1,4 +1,6 @@
-﻿using UnrealBuildTool;
+﻿// Copyright 2023 - 2025 Olexandr Zelenskyi. All Rights Reserved.
+
+using UnrealBuildTool;
 
 public class CinematicPlayer : ModuleRules
 {

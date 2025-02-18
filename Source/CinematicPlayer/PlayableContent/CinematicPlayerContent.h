@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// Copyright 2023 - 2025 Olexandr Zelenskyi. All Rights Reserved.
+
+#pragma once
 
 #include <CoreMinimal.h>
 #include <GameFramework/Actor.h>
@@ -6,39 +8,45 @@
 #include "CinematicPlayerContent.generated.h"
 
 class APlayerController;
+class UCinematicPlayerAction;
 class UEnhancedInputLocalPlayerSubsystem;
 class UInputMappingContext;
 class UUserWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayCutsceneResult);
 
-// CinematicPlayer playable content, must be used only by PlayCinematicAsync function (UPlayCinematicAsync).
-// Don't use directly or call Initialize first!
-UCLASS(Abstract, HideDropdown, NotPlaceable, NotBlueprintable)
+/**
+ * CinematicPlayer playable content, must be used only by PlayCinematicAsync function (UPlayCinematicAsync).
+ * Don't use directly or call Initialize first!
+ */
+UCLASS(Abstract, HideDropdown, NotPlaceable, NotBlueprintable, AutoExpandCategories=("CinematicPlayer", "Actions"), HideCategories = ("Collision", "Physics"))
 class CINEMATICPLAYER_API ACinematicPlayerContent : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	ACinematicPlayerContent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	ACinematicPlayerContent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void Initialize(TWeakObjectPtr<APlayerController> PlayerController);
 
+protected:
 	// Begin AActor overrides
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	// End AActor overrides
 
+	virtual void OpenAndPlayContent() { ; }
+	virtual void RequestDestroy();
+
+	virtual void EnableInputAndCreateUI();
+	virtual void DisableInputAndRemoveUI();
+
+public:
 	UFUNCTION(BlueprintPure, Category = "CinematicPlayer")
 	APlayerController* GetPlayerController() const { return OwningPlayerController.Get(); }
 
 	UFUNCTION(BlueprintPure, Category = "CinematicPlayer")
 	UUserWidget* GetPlayerWidget() const { return PlayerUserWidget.Get(); }
-
-	virtual void OpenAndPlayContent() { ; }
-	virtual void PlaybackStarted();
-	virtual void PlaybackStopped();
-	virtual void PlaybackFinished();
 
 	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", DisplayName = "Stop (Skip)")
 	virtual void Stop() { ; }
@@ -56,13 +64,21 @@ public:
 	void PressSkipKey(bool bPressed);
 
 protected:
-	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer|Events")
+	virtual void PlaybackStarted();
+	virtual void PlaybackStopped();
+	virtual void PlaybackFinished();
+
+	void ExecuteActionsAsync(const TArray<TObjectPtr<UCinematicPlayerAction>>& Actions, int32 ActionIndex, const TFunction<void()>& Callback);
+	void ForEachCinematicPlayerAction(const TFunctionRef<void(UCinematicPlayerAction* CinematicPlayerAction)>& Predicate) const;
+
+#pragma region Blueprint Events
+	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer|Events", DisplayName = "OnStart")
 	void ReceiveOnStart();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer|Events")
+	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer|Events", DisplayName = "OnStop")
 	void ReceiveOnStop();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer|Events")
+	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer|Events", DisplayName = "OnFinish")
 	void ReceiveOnFinish();
 
 	UFUNCTION(BlueprintNativeEvent, Category = "CinematicPlayer|Input")
@@ -80,6 +96,7 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "CinematicPlayer|UserInterface")
 	void RemovePlayerWidget(UUserWidget* PlayerWidget);
 	virtual void RemovePlayerWidget_Implementation(UUserWidget* PlayerWidget);
+#pragma endregion Blueprint Events
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -94,11 +111,25 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer")
 	bool bCanSkip = true;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer", AdvancedDisplay, Meta = (MustImplement = "/Script/CinematicPlayer.CinematicPlayerInterface"))
-	TSubclassOf<UUserWidget> WidgetClass;
+	// Called before Content playback (before OnStart delegate).
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
+	TArray<TObjectPtr<UCinematicPlayerAction>> StartupActions;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer", AdvancedDisplay)
-	int32 WidgetsZOrder = 0;
+	// Called when Stop (Skip) function called or error occured, but before OnStop delegate.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
+	TArray<TObjectPtr<UCinematicPlayerAction>> StopActions;
+
+	// Called when Stop (Skip) function called or error occured, after OnStop delegate.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
+	TArray<TObjectPtr<UCinematicPlayerAction>> PostStopActions;
+
+	// Called when playback finished without errors, but before OnFinish delegate.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
+	TArray<TObjectPtr<UCinematicPlayerAction>> FinishActions;
+
+	// Called when playback finished without errors, after OnFinish delegate.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
+	TArray<TObjectPtr<UCinematicPlayerAction>> PostFinishActions;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
@@ -108,6 +139,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	FModifyContextOptions InputMappingOptions;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UserInterface", Meta = (MustImplement = "/Script/CinematicPlayer.CinematicPlayerInterface"))
+	TSubclassOf<UUserWidget> WidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UserInterface")
+	int32 WidgetsZOrder = 0;
 
 protected:
 	TWeakObjectPtr<APlayerController> OwningPlayerController;

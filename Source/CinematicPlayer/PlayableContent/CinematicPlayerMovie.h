@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// Copyright 2023 - 2025 Olexandr Zelenskyi. All Rights Reserved.
+
+#pragma once
 
 #include "CinematicPlayerContent.h"
 #include "CinematicPlayerMovie.generated.h"
@@ -6,17 +8,22 @@
 class UFileMediaSource;
 class UMediaPlayer;
 
+/**
+ * Allow to play movies by MediaPlayer
+ */
 UCLASS(Abstract, HideDropdown, Blueprintable)
 class CINEMATICPLAYER_API ACinematicPlayerMovie : public ACinematicPlayerContent
 {
 	GENERATED_BODY()
 
-public:
 	// Begin ACinematicPlayerContent overrides
+protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void OpenAndPlayContent() override;
+
+public:
 	virtual void Stop() override;
 	virtual void Pause() override;
 	virtual void Resume() override;
@@ -24,16 +31,16 @@ public:
 
 private:
 	UFUNCTION()
-	void OnMediaOpened(FString OpenedUrl);
+	void OnMediaOpened_Callback(FString OpenedUrl);
 
 	UFUNCTION()
-	void OnMediaOpenFailed(FString FailedUrl);
+	void OnMediaOpenFailed_Callback(FString FailedUrl);
 
 	UFUNCTION()
-	void OnMediaClosed();
+	void OnMediaClosed_Callback();
 
 	UFUNCTION()
-	void OnEndReached();
+	void OnEndReached_Callback();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer")
