@@ -68,32 +68,32 @@ protected:
 	virtual void PlaybackStopped();
 	virtual void PlaybackFinished();
 
-	void ExecuteActionsAsync(const TArray<TObjectPtr<UCinematicPlayerAction>>& Actions, int32 ActionIndex, const TFunction<void()>& Callback);
+	void ExecuteActionsAsync(const TArray<TObjectPtr<UCinematicPlayerAction>>& Actions, int32 ActionIndex, TFunction<void()> Callback);
 	void ForEachCinematicPlayerAction(const TFunctionRef<void(UCinematicPlayerAction* CinematicPlayerAction)>& Predicate) const;
 
 #pragma region Blueprint Events
-	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer|Events", DisplayName = "OnStart")
+	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer", DisplayName = "OnStart")
 	void ReceiveOnStart();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer|Events", DisplayName = "OnStop")
+	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer", DisplayName = "OnStop")
 	void ReceiveOnStop();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer|Events", DisplayName = "OnFinish")
+	UFUNCTION(BlueprintImplementableEvent, Category = "CinematicPlayer", DisplayName = "OnFinish")
 	void ReceiveOnFinish();
 
-	UFUNCTION(BlueprintNativeEvent, Category = "CinematicPlayer|Input")
+	UFUNCTION(BlueprintNativeEvent, Category = "Input")
 	void AddInputMapping();
 	virtual void AddInputMapping_Implementation();
 
-	UFUNCTION(BlueprintNativeEvent, Category = "CinematicPlayer|Input")
+	UFUNCTION(BlueprintNativeEvent, Category = "Input")
 	void RemoveInputMapping();
 	virtual void RemoveInputMapping_Implementation();
 
-	UFUNCTION(BlueprintNativeEvent, Category = "CinematicPlayer|UserInterface")
+	UFUNCTION(BlueprintNativeEvent, Category = "UserInterface")
 	UUserWidget* CreatePlayerWidget(APlayerController* PlayerController);
 	virtual UUserWidget* CreatePlayerWidget_Implementation(APlayerController* PlayerController);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "CinematicPlayer|UserInterface")
+	UFUNCTION(BlueprintNativeEvent, Category = "UserInterface")
 	void RemovePlayerWidget(UUserWidget* PlayerWidget);
 	virtual void RemovePlayerWidget_Implementation(UUserWidget* PlayerWidget);
 #pragma endregion Blueprint Events

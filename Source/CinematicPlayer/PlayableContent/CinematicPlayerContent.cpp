@@ -173,7 +173,7 @@ void ACinematicPlayerContent::PlaybackFinished()
 	});
 }
 
-void ACinematicPlayerContent::ExecuteActionsAsync(const TArray<TObjectPtr<UCinematicPlayerAction>>& Actions, int32 ActionIndex, const TFunction<void()>& Callback)
+void ACinematicPlayerContent::ExecuteActionsAsync(const TArray<TObjectPtr<UCinematicPlayerAction>>& Actions, int32 ActionIndex, TFunction<void()> Callback)
 {
 	if (ActionIndex >= Actions.Num())
 	{
