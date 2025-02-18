@@ -7,6 +7,8 @@
 #include "CinematicPlayerAction.generated.h"
 
 class ACinematicPlayerContent;
+class APlayerController;
+class UUserWidget;
 
 /**
  * CinematicPlayer Async Action.
@@ -28,7 +30,13 @@ public:
 	virtual void ExecuteAction();
 
 	UFUNCTION(BlueprintPure, Category = "CinematicPlayerAction")
-	virtual ACinematicPlayerContent* GetPlayerContent() const;
+	ACinematicPlayerContent* GetOwningContent() const;
+
+	UFUNCTION(BlueprintPure, Category = "CinematicPlayerAction")
+	APlayerController* GetPlayerController() const;
+
+	UFUNCTION(BlueprintPure, Category = "CinematicPlayerAction")
+	UUserWidget* GetPlayerWidget() const;
 
 protected:
 	// Need to be called every time, when Async Quest Action executed!

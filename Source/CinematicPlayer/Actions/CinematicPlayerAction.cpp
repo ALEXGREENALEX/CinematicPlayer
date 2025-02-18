@@ -40,9 +40,19 @@ void UCinematicPlayerAction::ExecuteAction()
 	}
 }
 
-ACinematicPlayerContent* UCinematicPlayerAction::GetPlayerContent() const
+ACinematicPlayerContent* UCinematicPlayerAction::GetOwningContent() const
 {
 	return OwningPlayerContent.Get();
+}
+
+APlayerController* UCinematicPlayerAction::GetPlayerController() const
+{
+	return OwningPlayerContent.IsValid() ? OwningPlayerContent->GetPlayerController() : nullptr;
+}
+
+UUserWidget* UCinematicPlayerAction::GetPlayerWidget() const
+{
+	return OwningPlayerContent.IsValid() ? OwningPlayerContent->GetPlayerWidget() : nullptr;
 }
 
 void UCinematicPlayerAction::FinishAsyncExecution()
