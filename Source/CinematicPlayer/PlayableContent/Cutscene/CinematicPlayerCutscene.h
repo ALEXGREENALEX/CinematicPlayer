@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CinematicPlayerContent.h"
+#include "PlayableContent/CinematicPlayerContent.h"
 #include <Templates/SubclassOf.h>
 #include "CinematicPlayerCutscene.generated.h"
 
@@ -21,9 +21,19 @@ public:
 	ACinematicPlayerCutscene(const FObjectInitializer& ObjectInitializer);
 
 	// Begin ACinematicPlayerContent overrides
+protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+#pragma region Data Validation
+#if WITH_EDITOR
+	// Begin ACinematicPlayerContent overrides
+	virtual void ValidateData(FCinematicDataValidationContainer& DataValidationContainer) const override;
+	// End ACinematicPlayerContent overrides
+#endif
+#pragma endregion Data Validation
+
+public:
 	virtual void Stop() override;
 	virtual void Pause() override;
 	virtual void Resume() override;

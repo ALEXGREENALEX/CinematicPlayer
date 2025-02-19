@@ -6,6 +6,8 @@
 #include <UObject/Object.h>
 #include "CinematicPlayerAction.generated.h"
 
+struct FCinematicDataValidationContainer;
+
 class ACinematicPlayerContent;
 class APlayerController;
 class UUserWidget;
@@ -23,6 +25,27 @@ public:
 	// Begin UObject overrides
 	virtual UWorld* GetWorld() const override;
 	// End UObject overrides
+
+#pragma region Data Validation
+	/**
+	 * Check for invalid data, types and settings.
+	 * Call LogAddError, LogAddWarning or LogAddInfoNote if needed to handle some Errors or Warnings.
+	 * @param DataValidationContainer Container for errors and warnings.
+	 * @param PropertyPath used for build properties path like for errors, like "Arr[7].B.C".
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category = "Data Validation")
+	void ValidateData(UPARAM(ref) FCinematicDataValidationContainer& DataValidationContainer, const FString& PropertyPath) const;
+	virtual void ValidateData_Implementation(FCinematicDataValidationContainer& DataValidationContainer, const FString& PropertyPath) const { ; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "Data Validation", Meta = (AutoCreateRefTerm = "PropertyPath, Message"))
+	virtual void LogAddError(UPARAM(ref) FCinematicDataValidationContainer& DataValidationContainer, const FString& PropertyPath, const FText& Message) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "Data Validation", Meta = (AutoCreateRefTerm = "PropertyPath, Message"))
+	virtual void LogAddWarning(UPARAM(ref) FCinematicDataValidationContainer& DataValidationContainer, const FString& PropertyPath, const FText& Message) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "Data Validation", Meta = (AutoCreateRefTerm = "PropertyPath, Message"))
+	virtual void LogAddInfoNote(UPARAM(ref) FCinematicDataValidationContainer& DataValidationContainer, const FString& PropertyPath, const FText& Message) const;
+#pragma endregion Data Validation
 
 	virtual void Initialize(ACinematicPlayerContent* CinematicPlayerContent);
 	virtual void Construct();

@@ -5,6 +5,7 @@
 #include <FileMediaSource.h>
 #include <MediaPlayer.h>
 #include "Logs/CinematicPlayerLogs.h"
+#include "Data/CinematicDataValidationContainer.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CinematicPlayerMovie)
 
@@ -51,6 +52,25 @@ void ACinematicPlayerMovie::OpenAndPlayContent()
 		PlaybackStopped();
 	}
 }
+
+#pragma region Data Validation
+#if WITH_EDITOR
+void ACinematicPlayerMovie::ValidateData(FCinematicDataValidationContainer& DataValidationContainer) const
+{
+	if (!IsValid(MediaFile))
+	{
+		DataValidationContainer.AddWarning(INVTEXT("MediaFile is Not Valid or Empty!"));
+	}
+
+	if (!IsValid(MediaPlayer))
+	{
+		DataValidationContainer.AddWarning(INVTEXT("MediaPlayer is Not Valid or Empty!"));
+	}
+
+	Super::ValidateData(DataValidationContainer);
+}
+#endif
+#pragma endregion Data Validation
 
 void ACinematicPlayerMovie::Stop()
 {

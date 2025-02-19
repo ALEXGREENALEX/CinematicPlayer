@@ -7,6 +7,8 @@
 #include <EnhancedInputSubsystemInterface.h>
 #include "CinematicPlayerContent.generated.h"
 
+struct FCinematicDataValidationContainer;
+
 class APlayerController;
 class UCinematicPlayerAction;
 class UEnhancedInputLocalPlayerSubsystem;
@@ -28,6 +30,22 @@ public:
 	ACinematicPlayerContent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void Initialize(TWeakObjectPtr<APlayerController> PlayerController);
+
+#pragma region Data Validation
+#if WITH_EDITOR
+public:
+	// Begin UObject overrides
+	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
+	// End UObject overrides
+
+protected:
+	/**
+	 * Check for invalid data, types and settings.
+	 * @param DataValidationContainer Container for errors and warnings.
+	 */
+	virtual void ValidateData(FCinematicDataValidationContainer& DataValidationContainer) const;
+#endif
+#pragma endregion Data Validation
 
 protected:
 	// Begin AActor overrides
@@ -130,6 +148,10 @@ public:
 	// Called when playback finished without errors, after OnFinish delegate.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
 	TArray<TObjectPtr<UCinematicPlayerAction>> PostFinishActions;
+
+	// Called after all actions when playback completed.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
+	TArray<TObjectPtr<UCinematicPlayerAction>> EndActions;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;

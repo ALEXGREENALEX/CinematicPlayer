@@ -1,6 +1,7 @@
 ﻿// Copyright 2023 - 2025 Olexandr Zelenskyi. All Rights Reserved.
 
 #include "CinematicPlayerAction.h"
+#include "Data/CinematicDataValidationContainer.h"
 #include "PlayableContent/CinematicPlayerContent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CinematicPlayerAction)
@@ -9,6 +10,23 @@ UWorld* UCinematicPlayerAction::GetWorld() const
 {
 	return OwningPlayerContent.IsValid() ? OwningPlayerContent->GetWorld() : nullptr;
 }
+
+#pragma region Data Validation
+void UCinematicPlayerAction::LogAddError(FCinematicDataValidationContainer& DataValidationContainer, const FString& PropertyPath, const FText& Message) const
+{
+	DataValidationContainer.AddError(Message, PropertyPath);
+}
+
+void UCinematicPlayerAction::LogAddWarning(FCinematicDataValidationContainer& DataValidationContainer, const FString& PropertyPath, const FText& Message) const
+{
+	DataValidationContainer.AddWarning(Message, PropertyPath);
+}
+
+void UCinematicPlayerAction::LogAddInfoNote(FCinematicDataValidationContainer& DataValidationContainer, const FString& PropertyPath, const FText& Message) const
+{
+	DataValidationContainer.AddInfoNote(Message, PropertyPath);
+}
+#pragma endregion Data Validation
 
 void UCinematicPlayerAction::Initialize(ACinematicPlayerContent* CinematicPlayerContent)
 {

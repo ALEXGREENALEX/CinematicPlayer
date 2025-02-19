@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CinematicPlayerContent.h"
+#include "PlayableContent/CinematicPlayerContent.h"
 #include "CinematicPlayerMovie.generated.h"
 
 class UFileMediaSource;
@@ -22,6 +22,14 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void OpenAndPlayContent() override;
+
+#pragma region Data Validation
+#if WITH_EDITOR
+	// Begin ACinematicPlayerContent overrides
+	virtual void ValidateData(FCinematicDataValidationContainer& DataValidationContainer) const override;
+	// End ACinematicPlayerContent overrides
+#endif
+#pragma endregion Data Validation
 
 public:
 	virtual void Stop() override;

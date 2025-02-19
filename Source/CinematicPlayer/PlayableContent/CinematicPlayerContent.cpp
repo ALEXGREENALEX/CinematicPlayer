@@ -6,7 +6,13 @@
 #include <InputMappingContext.h>
 #include "Logs/CinematicPlayerLogs.h"
 #include "Actions/CinematicPlayerAction.h"
+#include "Data/CinematicDataValidationContainer.h"
 #include "Interfaces/CinematicPlayerWidgetInterface.h"
+
+#if WITH_EDITOR
+#include <AssetRegistry/AssetData.h>
+#include <Misc/DataValidation.h>
+#endif
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CinematicPlayerContent)
 
@@ -29,6 +35,93 @@ void ACinematicPlayerContent::Initialize(TWeakObjectPtr<APlayerController> Playe
 		}
 	});
 }
+
+#pragma region Data Validation
+#if WITH_EDITOR
+EDataValidationResult ACinematicPlayerContent::IsDataValid(FDataValidationContext& Context) const
+{
+	EDataValidationResult Result = Super::IsDataValid(Context);
+
+	const UClass* Class = GetClass();
+	if (!IsValid(Class) || Class->HasAnyClassFlags(CLASS_Abstract))
+	{
+		return Result; // Allow to mark Base BP as abstract and skip validation and errors
+	}
+
+	// Suspend errors when Saving
+	if (Context.GetValidationUsecase() == EDataValidationUsecase::Save)
+	{
+		return Result;
+	}
+
+	FCinematicDataValidationContainer Container;
+	ValidateData(Container);
+
+	// Hide full path to self in Compile Log (UseCase == None), but show with Manual Validation.
+	const UObject* Blueprint = GetClass() ? GetClass()->ClassGeneratedBy : nullptr;
+	const FAssetData Asset = FAssetData(Context.GetValidationUsecase() == EDataValidationUsecase::None ? nullptr : Blueprint);
+
+	bool bHasAnyErrorsOrWarnings = false;
+	for (const FCinematicDataValidationRecord& Record : Container.Records)
+	{
+		if (Record.PropertyPath.IsEmpty())
+		{
+			Context.AddMessage(Asset, Record.Severity, Record.Message);
+		}
+		else
+		{
+			const FText MessageToLog = FText::Format(INVTEXT("{0}: {1}"), FText::FromString(Record.PropertyPath), Record.Message);
+			Context.AddMessage(Asset, Record.Severity, MessageToLog);
+		}
+
+		if (Record.Severity <= EMessageSeverity::Info)
+		{
+			bHasAnyErrorsOrWarnings = true;
+		}
+	}
+
+	if (bHasAnyErrorsOrWarnings)
+	{
+		Result = EDataValidationResult::Invalid;
+	}
+
+	return Result;
+}
+
+void ACinematicPlayerContent::ValidateData(FCinematicDataValidationContainer& DataValidationContainer) const
+{
+	// No need in all cases, but need for current project
+	if (bCanSkip && !IsValid(InputMappingContext))
+	{
+		DataValidationContainer.AddWarning(INVTEXT("CanSkip = true, but InputMappingContext is Not Valid or Empty!"));
+	}
+
+	auto ValidateActions = [&](const TArray<TObjectPtr<UCinematicPlayerAction>>& Actions, const FString& PropertyName)
+	{
+		for (int32 i = 0; i < Actions.Num(); i++)
+		{
+			const FString PropertyPath = FString::Format(TEXT("{0}[{1}]"), {PropertyName, i});
+			UCinematicPlayerAction* Action = Actions[i];
+			if (IsValid(Action))
+			{
+				Action->ValidateData(DataValidationContainer, PropertyPath);
+			}
+			else
+			{
+				DataValidationContainer.AddWarning(INVTEXT("Action is Not Valid or Empty!"), PropertyPath);
+			}
+		}
+	};
+
+	ValidateActions(StartupActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, StartupActions));
+	ValidateActions(StopActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, StopActions));
+	ValidateActions(PostStopActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, PostStopActions));
+	ValidateActions(FinishActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, FinishActions));
+	ValidateActions(PostFinishActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, PostFinishActions));
+	ValidateActions(EndActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, EndActions));
+}
+#endif
+#pragma endregion Data Validation
 
 void ACinematicPlayerContent::BeginPlay()
 {
@@ -148,7 +241,10 @@ void ACinematicPlayerContent::PlaybackStopped()
 
 		ExecuteActionsAsync(PostStopActions, 0, [this]()
 		{
-			RequestDestroy();
+			ExecuteActionsAsync(EndActions, 0, [this]()
+			{
+				RequestDestroy();
+			});
 		});
 	});
 }
@@ -168,7 +264,10 @@ void ACinematicPlayerContent::PlaybackFinished()
 
 		ExecuteActionsAsync(PostFinishActions, 0, [this]()
 		{
-			RequestDestroy();
+			ExecuteActionsAsync(EndActions, 0, [this]()
+			{
+				RequestDestroy();
+			});
 		});
 	});
 }
@@ -218,6 +317,7 @@ void ACinematicPlayerContent::ForEachCinematicPlayerAction(const TFunctionRef<vo
 	CallPredicate(PostStopActions);
 	CallPredicate(FinishActions);
 	CallPredicate(PostFinishActions);
+	CallPredicate(EndActions);
 }
 
 void ACinematicPlayerContent::AddInputMapping_Implementation()
