@@ -44,13 +44,30 @@ void ACinematicPlayerMovie::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void ACinematicPlayerMovie::OpenAndPlayContent()
+bool ACinematicPlayerMovie::OpenAndPlayContent()
 {
-	if (!IsValid(MediaPlayer) || !IsValid(MediaFile) || !MediaPlayer->OpenSource(MediaFile))
+	if (!IsValid(MediaPlayer))
 	{
-		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] Can't Play MediaFile!", FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] MediaPlayer is Not Valid!", FUNC_STR);
 		PlaybackStopped();
+		return false;
 	}
+
+	if (!IsValid(MediaFile))
+	{
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] MediaFile is Not Valid!", FUNC_STR);
+		PlaybackStopped();
+		return false;
+	}
+
+	if (!MediaPlayer->OpenSource(MediaFile))
+	{
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] Can't open MediaFile Source!", FUNC_STR);
+		PlaybackStopped();
+		return false;
+	}
+
+	return true;
 }
 
 #pragma region Data Validation

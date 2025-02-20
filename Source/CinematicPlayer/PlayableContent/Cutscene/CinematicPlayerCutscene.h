@@ -25,6 +25,9 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	virtual bool OpenAndPlayContent() override;
+	virtual void RequestDestroy() override;
+
 #pragma region Data Validation
 #if WITH_EDITOR
 	// Begin ACinematicPlayerContent overrides
@@ -37,10 +40,6 @@ public:
 	virtual void Stop() override;
 	virtual void Pause() override;
 	virtual void Resume() override;
-
-protected:
-	virtual void OpenAndPlayContent() override;
-	virtual void RequestDestroy() override;
 	// End ACinematicPlayerContent overrides
 
 private:

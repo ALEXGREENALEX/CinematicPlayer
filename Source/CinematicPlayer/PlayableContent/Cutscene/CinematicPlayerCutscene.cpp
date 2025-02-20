@@ -75,6 +75,37 @@ void ACinematicPlayerCutscene::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+bool ACinematicPlayerCutscene::OpenAndPlayContent()
+{
+	if (!LevelSequenceActor.IsValid())
+	{
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] LevelSequenceActor is Not Valid!", FUNC_STR);
+		PlaybackStopped();
+		return false;
+	}
+
+	ULevelSequencePlayer* SequencePlayer = LevelSequenceActor->GetSequencePlayer();
+	if (!IsValid(SequencePlayer) || !SequencePlayer->IsValid())
+	{
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] SequencePlayer is Not Valid!", FUNC_STR);
+		PlaybackStopped();
+		return false;
+	}
+
+	SequencePlayer->Play();
+	return true;
+}
+
+void ACinematicPlayerCutscene::RequestDestroy()
+{
+	// Delay until next frame (Can't Destroy LevelSequenceActor before RunLatentActions() will be called in UMovieSceneSequencePlayer)
+	FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateWeakLambda(this, [this](float InDelta)
+	{
+		Super::RequestDestroy(); // Destroy(false, false);
+		return false;
+	}));
+}
+
 #pragma region Data Validation
 #if WITH_EDITOR
 void ACinematicPlayerCutscene::ValidateData(FCinematicDataValidationContainer& DataValidationContainer) const
@@ -130,28 +161,6 @@ void ACinematicPlayerCutscene::Resume()
 			SequencePlayer->Play();
 		}
 	}
-}
-
-void ACinematicPlayerCutscene::OpenAndPlayContent()
-{
-	if (LevelSequenceActor.IsValid())
-	{
-		ULevelSequencePlayer* SequencePlayer = LevelSequenceActor->GetSequencePlayer();
-		if (IsValid(SequencePlayer) && SequencePlayer->IsValid())
-		{
-			SequencePlayer->Play();
-		}
-	}
-}
-
-void ACinematicPlayerCutscene::RequestDestroy()
-{
-	// Delay until next frame (Can't Destroy LevelSequenceActor before RunLatentActions() will be called in UMovieSceneSequencePlayer)
-	FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateWeakLambda(this, [this](float InDelta)
-	{
-		Super::RequestDestroy(); // Destroy(false, false);
-		return false;
-	}));
 }
 
 void ACinematicPlayerCutscene::OnPlay_Callback()

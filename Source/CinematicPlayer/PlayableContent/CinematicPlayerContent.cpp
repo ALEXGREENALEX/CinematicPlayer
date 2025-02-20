@@ -116,6 +116,8 @@ void ACinematicPlayerContent::ValidateData(FCinematicDataValidationContainer& Da
 	ValidateActions(StartupActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, StartupActions));
 	ValidateActions(PostStartActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, PostStartActions));
 
+	ValidateActions(PreEndActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, PreEndActions));
+
 	ValidateActions(StopActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, StopActions));
 	ValidateActions(FinishActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, FinishActions));
 	ValidateActions(EndActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, EndActions));
@@ -148,8 +150,10 @@ void ACinematicPlayerContent::BeginPlay()
 
 	ExecuteActionsAsync(StartupActions, 0, [this]()
 	{
-		EnableInputAndCreateUI();
-		OpenAndPlayContent();
+		if (OpenAndPlayContent())
+		{
+			EnableInputAndCreateUI();
+		}
 	});
 }
 
@@ -236,22 +240,25 @@ void ACinematicPlayerContent::PlaybackStopped()
 {
 	DisableInputAndRemoveUI();
 
-	ExecuteActionsAsync(StopActions, 0, [this]()
+	ExecuteActionsAsync(PreEndActions, 0, [this]()
 	{
-		ExecuteActionsAsync(EndActions, 0, [this]()
+		ExecuteActionsAsync(StopActions, 0, [this]()
 		{
-			ReceiveOnStop();
-
-			if (OnStop.IsBound())
+			ExecuteActionsAsync(EndActions, 0, [this]()
 			{
-				OnStop.Broadcast();
-			}
+				ReceiveOnStop();
 
-			ExecuteActionsAsync(PostStopActions, 0, [this]()
-			{
-				ExecuteActionsAsync(PostEndActions, 0, [this]()
+				if (OnStop.IsBound())
 				{
-					RequestDestroy();
+					OnStop.Broadcast();
+				}
+
+				ExecuteActionsAsync(PostStopActions, 0, [this]()
+				{
+					ExecuteActionsAsync(PostEndActions, 0, [this]()
+					{
+						RequestDestroy();
+					});
 				});
 			});
 		});
@@ -262,22 +269,25 @@ void ACinematicPlayerContent::PlaybackFinished()
 {
 	DisableInputAndRemoveUI();
 
-	ExecuteActionsAsync(FinishActions, 0, [this]()
+	ExecuteActionsAsync(PreEndActions, 0, [this]()
 	{
-		ExecuteActionsAsync(EndActions, 0, [this]()
+		ExecuteActionsAsync(FinishActions, 0, [this]()
 		{
-			ReceiveOnFinish();
-
-			if (OnFinish.IsBound())
+			ExecuteActionsAsync(EndActions, 0, [this]()
 			{
-				OnFinish.Broadcast();
-			}
+				ReceiveOnFinish();
 
-			ExecuteActionsAsync(PostFinishActions, 0, [this]()
-			{
-				ExecuteActionsAsync(PostEndActions, 0, [this]()
+				if (OnFinish.IsBound())
 				{
-					RequestDestroy();
+					OnFinish.Broadcast();
+				}
+
+				ExecuteActionsAsync(PostFinishActions, 0, [this]()
+				{
+					ExecuteActionsAsync(PostEndActions, 0, [this]()
+					{
+						RequestDestroy();
+					});
 				});
 			});
 		});
@@ -329,6 +339,8 @@ void ACinematicPlayerContent::ForEachCinematicPlayerAction(const TFunctionRef<vo
 
 	CallPredicate(StartupActions);
 	CallPredicate(PostStartActions);
+
+	CallPredicate(PreEndActions);
 
 	CallPredicate(StopActions);
 	CallPredicate(FinishActions);

@@ -53,7 +53,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	// End AActor overrides
 
-	virtual void OpenAndPlayContent() { ; }
+	virtual bool OpenAndPlayContent() { return true; }
 	virtual void RequestDestroy();
 
 	virtual void EnableInputAndCreateUI();
@@ -66,7 +66,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "CinematicPlayer")
 	UUserWidget* GetPlayerWidget() const { return PlayerUserWidget.Get(); }
 
-	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", DisplayName = "Stop (Skip)")
+	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", DisplayName = "Stop (Skip)", Meta = (Keywords = "Stop Skip"))
 	virtual void Stop() { ; }
 
 	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer")
@@ -137,8 +137,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
 	TArray<TObjectPtr<UCinematicPlayerAction>> PostStartActions;
 
-	// Called when Stop (Skip) function called or error occured, but before Stop delegate.
+	// Called when playback finished, before Stop/Finish actions and delegates
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
+	TArray<TObjectPtr<UCinematicPlayerAction>> PreEndActions;
+
+	// Called when Stop (Skip) function called or error occured, but before Stop delegate.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced, DisplayName = "Stop (Skip) Actions")
 	TArray<TObjectPtr<UCinematicPlayerAction>> StopActions;
 
 	// Called when playback finished without errors, but before Finish delegate.
@@ -150,7 +154,7 @@ public:
 	TArray<TObjectPtr<UCinematicPlayerAction>> EndActions;
 
 	// Called when Stop (Skip) function called or error occured, after Stop delegate.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced, DisplayName = "Post Stop (Skip) Actions")
 	TArray<TObjectPtr<UCinematicPlayerAction>> PostStopActions;
 
 	// Called when playback finished without errors, after Finish delegate.
