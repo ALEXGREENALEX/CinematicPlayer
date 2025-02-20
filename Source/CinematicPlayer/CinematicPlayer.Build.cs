@@ -7,8 +7,7 @@ public class CinematicPlayer : ModuleRules
 	public CinematicPlayer(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
-		PublicIncludePaths.AddRange(new[] { ModuleDirectory });
+		PublicIncludePaths.Add(ModuleDirectory);
 
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
