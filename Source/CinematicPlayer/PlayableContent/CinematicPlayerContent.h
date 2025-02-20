@@ -86,7 +86,7 @@ protected:
 	virtual void PlaybackStopped();
 	virtual void PlaybackFinished();
 
-	void ExecuteActionsAsync(const TArray<TObjectPtr<UCinematicPlayerAction>>& Actions, int32 ActionIndex, TFunction<void()> Callback);
+	void ExecuteActionsAsync(const TArray<TObjectPtr<UCinematicPlayerAction>>& Actions, int32 ActionIndex, TFunction<void()> Callback = nullptr);
 	void ForEachCinematicPlayerAction(const TFunctionRef<void(UCinematicPlayerAction* CinematicPlayerAction)>& Predicate) const;
 
 #pragma region Blueprint Events
@@ -129,29 +129,37 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CinematicPlayer")
 	bool bCanSkip = true;
 
-	// Called before Content playback (before OnStart delegate).
+	// Called before Content playback (before Start delegate).
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
 	TArray<TObjectPtr<UCinematicPlayerAction>> StartupActions;
 
-	// Called when Stop (Skip) function called or error occured, but before OnStop delegate.
+	// Called when Content playback started (after Start delegate).
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
+	TArray<TObjectPtr<UCinematicPlayerAction>> PostStartActions;
+
+	// Called when Stop (Skip) function called or error occured, but before Stop delegate.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
 	TArray<TObjectPtr<UCinematicPlayerAction>> StopActions;
 
-	// Called when Stop (Skip) function called or error occured, after OnStop delegate.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
-	TArray<TObjectPtr<UCinematicPlayerAction>> PostStopActions;
-
-	// Called when playback finished without errors, but before OnFinish delegate.
+	// Called when playback finished without errors, but before Finish delegate.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
 	TArray<TObjectPtr<UCinematicPlayerAction>> FinishActions;
 
-	// Called when playback finished without errors, after OnFinish delegate.
+	// Called after Finish or Stop Actions, but before Stop/Finish delegates.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
+	TArray<TObjectPtr<UCinematicPlayerAction>> EndActions;
+
+	// Called when Stop (Skip) function called or error occured, after Stop delegate.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
+	TArray<TObjectPtr<UCinematicPlayerAction>> PostStopActions;
+
+	// Called when playback finished without errors, after Finish delegate.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
 	TArray<TObjectPtr<UCinematicPlayerAction>> PostFinishActions;
 
-	// Called after all actions when playback completed.
+	// Called after PostFinishActions or PostStopActions, after Stop/Finish delegates.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", Instanced)
-	TArray<TObjectPtr<UCinematicPlayerAction>> EndActions;
+	TArray<TObjectPtr<UCinematicPlayerAction>> PostEndActions;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;

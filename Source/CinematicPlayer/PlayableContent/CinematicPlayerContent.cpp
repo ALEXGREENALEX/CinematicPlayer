@@ -114,11 +114,15 @@ void ACinematicPlayerContent::ValidateData(FCinematicDataValidationContainer& Da
 	};
 
 	ValidateActions(StartupActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, StartupActions));
+	ValidateActions(PostStartActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, PostStartActions));
+
 	ValidateActions(StopActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, StopActions));
-	ValidateActions(PostStopActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, PostStopActions));
 	ValidateActions(FinishActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, FinishActions));
-	ValidateActions(PostFinishActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, PostFinishActions));
 	ValidateActions(EndActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, EndActions));
+
+	ValidateActions(PostStopActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, PostStopActions));
+	ValidateActions(PostFinishActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, PostFinishActions));
+	ValidateActions(PostEndActions, GET_MEMBER_NAME_STRING_CHECKED(ThisClass, PostEndActions));
 }
 #endif
 #pragma endregion Data Validation
@@ -224,6 +228,8 @@ void ACinematicPlayerContent::PlaybackStarted()
 	{
 		ICinematicPlayerWidgetInterface::Execute_Start(PlayerUserWidget.Get());
 	}
+
+	ExecuteActionsAsync(PostStartActions, 0);
 }
 
 void ACinematicPlayerContent::PlaybackStopped()
@@ -232,18 +238,21 @@ void ACinematicPlayerContent::PlaybackStopped()
 
 	ExecuteActionsAsync(StopActions, 0, [this]()
 	{
-		ReceiveOnStop();
-
-		if (OnStop.IsBound())
+		ExecuteActionsAsync(EndActions, 0, [this]()
 		{
-			OnStop.Broadcast();
-		}
+			ReceiveOnStop();
 
-		ExecuteActionsAsync(PostStopActions, 0, [this]()
-		{
-			ExecuteActionsAsync(EndActions, 0, [this]()
+			if (OnStop.IsBound())
 			{
-				RequestDestroy();
+				OnStop.Broadcast();
+			}
+
+			ExecuteActionsAsync(PostStopActions, 0, [this]()
+			{
+				ExecuteActionsAsync(PostEndActions, 0, [this]()
+				{
+					RequestDestroy();
+				});
 			});
 		});
 	});
@@ -255,18 +264,21 @@ void ACinematicPlayerContent::PlaybackFinished()
 
 	ExecuteActionsAsync(FinishActions, 0, [this]()
 	{
-		ReceiveOnFinish();
-
-		if (OnFinish.IsBound())
+		ExecuteActionsAsync(EndActions, 0, [this]()
 		{
-			OnFinish.Broadcast();
-		}
+			ReceiveOnFinish();
 
-		ExecuteActionsAsync(PostFinishActions, 0, [this]()
-		{
-			ExecuteActionsAsync(EndActions, 0, [this]()
+			if (OnFinish.IsBound())
 			{
-				RequestDestroy();
+				OnFinish.Broadcast();
+			}
+
+			ExecuteActionsAsync(PostFinishActions, 0, [this]()
+			{
+				ExecuteActionsAsync(PostEndActions, 0, [this]()
+				{
+					RequestDestroy();
+				});
 			});
 		});
 	});
@@ -276,7 +288,10 @@ void ACinematicPlayerContent::ExecuteActionsAsync(const TArray<TObjectPtr<UCinem
 {
 	if (ActionIndex >= Actions.Num())
 	{
-		Callback();
+		if (Callback)
+		{
+			Callback();
+		}
 		return;
 	}
 
@@ -313,11 +328,15 @@ void ACinematicPlayerContent::ForEachCinematicPlayerAction(const TFunctionRef<vo
 	};
 
 	CallPredicate(StartupActions);
+	CallPredicate(PostStartActions);
+
 	CallPredicate(StopActions);
-	CallPredicate(PostStopActions);
 	CallPredicate(FinishActions);
-	CallPredicate(PostFinishActions);
 	CallPredicate(EndActions);
+
+	CallPredicate(PostStopActions);
+	CallPredicate(PostFinishActions);
+	CallPredicate(PostEndActions);
 }
 
 void ACinematicPlayerContent::AddInputMapping_Implementation()
