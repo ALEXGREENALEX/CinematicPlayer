@@ -6,7 +6,7 @@
 #include <InputMappingContext.h>
 #include "Logs/CinematicPlayerLogs.h"
 #include "Actions/CinematicPlayerAction.h"
-#include "Data/CinematicDataValidationContainer.h"
+#include "Data/CinematicDataValidationContext.h"
 #include "Interfaces/CinematicPlayerWidgetInterface.h"
 
 #if WITH_EDITOR
@@ -54,7 +54,7 @@ EDataValidationResult ACinematicPlayerContent::IsDataValid(FDataValidationContex
 		return Result;
 	}
 
-	FCinematicDataValidationContainer Container;
+	FCinematicDataValidationContext Container;
 	ValidateData(Container);
 
 	// Hide full path to self in Compile Log (UseCase == None), but show with Manual Validation.
@@ -88,12 +88,12 @@ EDataValidationResult ACinematicPlayerContent::IsDataValid(FDataValidationContex
 	return Result;
 }
 
-void ACinematicPlayerContent::ValidateData(FCinematicDataValidationContainer& DataValidationContainer) const
+void ACinematicPlayerContent::ValidateData(FCinematicDataValidationContext& Context) const
 {
 	// No need in all cases, but need for current project
 	if (bCanSkip && !IsValid(InputMappingContext))
 	{
-		DataValidationContainer.AddWarning(INVTEXT("CanSkip = true, but InputMappingContext is Not Valid or Empty!"));
+		Context.AddWarning(INVTEXT("CanSkip = true, but InputMappingContext is Not Valid or Empty!"));
 	}
 
 	auto ValidateActions = [&](const TArray<TObjectPtr<UCinematicPlayerAction>>& Actions, const FString& PropertyName)
@@ -104,11 +104,11 @@ void ACinematicPlayerContent::ValidateData(FCinematicDataValidationContainer& Da
 			UCinematicPlayerAction* Action = Actions[i];
 			if (IsValid(Action))
 			{
-				Action->ValidateData(DataValidationContainer, PropertyPath);
+				Action->ValidateData(Context, PropertyPath);
 			}
 			else
 			{
-				DataValidationContainer.AddWarning(INVTEXT("Action is Not Valid or Empty!"), PropertyPath);
+				Context.AddWarning(INVTEXT("Action is Not Valid or Empty!"), PropertyPath);
 			}
 		}
 	};

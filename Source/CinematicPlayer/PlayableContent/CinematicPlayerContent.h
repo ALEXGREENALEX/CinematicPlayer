@@ -7,7 +7,7 @@
 #include <EnhancedInputSubsystemInterface.h>
 #include "CinematicPlayerContent.generated.h"
 
-struct FCinematicDataValidationContainer;
+struct FCinematicDataValidationContext;
 
 class APlayerController;
 class UCinematicPlayerAction;
@@ -41,9 +41,9 @@ public:
 protected:
 	/**
 	 * Check for invalid data, types and settings.
-	 * @param DataValidationContainer Container for errors and warnings.
+	 * @param Context Container for errors and warnings.
 	 */
-	virtual void ValidateData(FCinematicDataValidationContainer& DataValidationContainer) const;
+	virtual void ValidateData(FCinematicDataValidationContext& Context) const;
 #endif
 #pragma endregion Data Validation
 

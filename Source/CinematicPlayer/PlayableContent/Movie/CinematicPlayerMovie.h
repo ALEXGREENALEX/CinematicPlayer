@@ -26,7 +26,7 @@ protected:
 #pragma region Data Validation
 #if WITH_EDITOR
 	// Begin ACinematicPlayerContent overrides
-	virtual void ValidateData(FCinematicDataValidationContainer& DataValidationContainer) const override;
+	virtual void ValidateData(FCinematicDataValidationContext& Context) const override;
 	// End ACinematicPlayerContent overrides
 #endif
 #pragma endregion Data Validation

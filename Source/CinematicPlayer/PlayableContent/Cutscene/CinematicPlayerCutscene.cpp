@@ -6,7 +6,7 @@
 #include <LevelSequenceActor.h>
 #include <LevelSequencePlayer.h>
 #include "Logs/CinematicPlayerLogs.h"
-#include "Data/CinematicDataValidationContainer.h"
+#include "Data/CinematicDataValidationContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CinematicPlayerCutscene)
 
@@ -108,19 +108,19 @@ void ACinematicPlayerCutscene::RequestDestroy()
 
 #pragma region Data Validation
 #if WITH_EDITOR
-void ACinematicPlayerCutscene::ValidateData(FCinematicDataValidationContainer& DataValidationContainer) const
+void ACinematicPlayerCutscene::ValidateData(FCinematicDataValidationContext& Context) const
 {
 	if (!IsValid(LevelSequence))
 	{
-		DataValidationContainer.AddWarning(INVTEXT("LevelSequence is Not Valid or Empty!"));
+		Context.AddWarning(INVTEXT("LevelSequence is Not Valid or Empty!"));
 	}
 
 	if (!IsValid(LevelSequenceActorClass))
 	{
-		DataValidationContainer.AddWarning(INVTEXT("LevelSequenceActorClass is Not Valid or Empty!"));
+		Context.AddWarning(INVTEXT("LevelSequenceActorClass is Not Valid or Empty!"));
 	}
 
-	Super::ValidateData(DataValidationContainer);
+	Super::ValidateData(Context);
 }
 #endif
 #pragma endregion Data Validation

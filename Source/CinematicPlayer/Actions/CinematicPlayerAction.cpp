@@ -1,7 +1,7 @@
 ﻿// Copyright 2023 - 2025 Olexandr Zelenskyi. All Rights Reserved.
 
 #include "CinematicPlayerAction.h"
-#include "Data/CinematicDataValidationContainer.h"
+#include "Data/CinematicDataValidationContext.h"
 #include "PlayableContent/CinematicPlayerContent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CinematicPlayerAction)
@@ -12,19 +12,19 @@ UWorld* UCinematicPlayerAction::GetWorld() const
 }
 
 #pragma region Data Validation
-void UCinematicPlayerAction::LogAddError(FCinematicDataValidationContainer& DataValidationContainer, const FString& PropertyPath, const FText& Message) const
+void UCinematicPlayerAction::LogAddError(FCinematicDataValidationContext& Context, const FString& PropertyPath, const FText& Message) const
 {
-	DataValidationContainer.AddError(Message, PropertyPath);
+	Context.AddError(Message, PropertyPath);
 }
 
-void UCinematicPlayerAction::LogAddWarning(FCinematicDataValidationContainer& DataValidationContainer, const FString& PropertyPath, const FText& Message) const
+void UCinematicPlayerAction::LogAddWarning(FCinematicDataValidationContext& Context, const FString& PropertyPath, const FText& Message) const
 {
-	DataValidationContainer.AddWarning(Message, PropertyPath);
+	Context.AddWarning(Message, PropertyPath);
 }
 
-void UCinematicPlayerAction::LogAddInfoNote(FCinematicDataValidationContainer& DataValidationContainer, const FString& PropertyPath, const FText& Message) const
+void UCinematicPlayerAction::LogAddInfoNote(FCinematicDataValidationContext& Context, const FString& PropertyPath, const FText& Message) const
 {
-	DataValidationContainer.AddInfoNote(Message, PropertyPath);
+	Context.AddInfoNote(Message, PropertyPath);
 }
 #pragma endregion Data Validation
 

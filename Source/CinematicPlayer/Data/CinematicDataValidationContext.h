@@ -4,7 +4,7 @@
 
 #include <CoreMinimal.h>
 #include <Logging/TokenizedMessage.h>
-#include "CinematicDataValidationContainer.generated.h"
+#include "CinematicDataValidationContext.generated.h"
 
 USTRUCT(BlueprintType)
 struct CINEMATICPLAYER_API FCinematicDataValidationRecord
@@ -31,7 +31,7 @@ struct CINEMATICPLAYER_API FCinematicDataValidationRecord
  * Used for print Errors and Warnings to MessageLog during BP and Nodes compilation
  */
 USTRUCT(BlueprintType)
-struct CINEMATICPLAYER_API FCinematicDataValidationContainer
+struct CINEMATICPLAYER_API FCinematicDataValidationContext
 {
 	GENERATED_BODY()
 
@@ -42,6 +42,6 @@ struct CINEMATICPLAYER_API FCinematicDataValidationContainer
 	void AddWarning(const FText& Message, const FString& PropertyPath = TEXT(""));
 	void AddInfoNote(const FText& Message, const FString& PropertyPath = TEXT(""));
 	void AddMessage(EMessageSeverity::Type Severity, const FText& Message, const FString& PropertyPath = TEXT(""));
-	void AppendMessages(const FCinematicDataValidationContainer& DataValidationContainer);
+	void AppendMessages(const FCinematicDataValidationContext& Context);
 	void ClearMessages();
 };
