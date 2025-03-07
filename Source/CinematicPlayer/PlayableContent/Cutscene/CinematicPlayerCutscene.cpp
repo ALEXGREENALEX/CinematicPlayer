@@ -133,7 +133,7 @@ void ACinematicPlayerCutscene::Stop()
 		if (IsValid(SequencePlayer) && SequencePlayer->IsValid())
 		{
 			SequencePlayer->OnFinished.RemoveDynamic(this, &ACinematicPlayerCutscene::OnFinished_Callback);
-			SequencePlayer->OnStop.AddDynamic(this, &ACinematicPlayerCutscene::OnStop_Callback);
+			SequencePlayer->OnStop.AddUniqueDynamic(this, &ACinematicPlayerCutscene::OnStop_Callback);
 			SequencePlayer->Stop();
 		}
 	}
