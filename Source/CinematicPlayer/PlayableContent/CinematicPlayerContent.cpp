@@ -190,6 +190,7 @@ void ACinematicPlayerContent::EnableInputAndCreateUI()
 void ACinematicPlayerContent::DisableInputAndRemoveUI()
 {
 	RemoveInputMapping();
+	bSkipKeyPressed = false;
 
 	if (OwningPlayerController.IsValid())
 	{
@@ -205,6 +206,13 @@ void ACinematicPlayerContent::DisableInputAndRemoveUI()
 
 void ACinematicPlayerContent::PressAnyKey(bool bPressed)
 {
+	if (bAnyKeyPressed == bPressed || bSkipKeyPressed)
+	{
+		return;
+	}
+
+	bAnyKeyPressed = bPressed;
+
 	if (PlayerUserWidget.IsValid())
 	{
 		ICinematicPlayerWidgetInterface::Execute_AnyKeyPressed(PlayerUserWidget.Get(), bPressed);
@@ -213,6 +221,18 @@ void ACinematicPlayerContent::PressAnyKey(bool bPressed)
 
 void ACinematicPlayerContent::PressSkipKey(bool bPressed)
 {
+	if (bSkipKeyPressed == bPressed)
+	{
+		return;
+	}
+
+	if (bAnyKeyPressed) // Force Release "Any Key"
+	{
+		PressAnyKey(false);
+	}
+
+	bSkipKeyPressed = bPressed;
+
 	if (PlayerUserWidget.IsValid())
 	{
 		ICinematicPlayerWidgetInterface::Execute_SkipKeyPressed(PlayerUserWidget.Get(), bPressed);

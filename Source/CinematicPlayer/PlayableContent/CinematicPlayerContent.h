@@ -184,4 +184,6 @@ protected:
 	TWeakObjectPtr<APlayerController> OwningPlayerController;
 	TWeakObjectPtr<UEnhancedInputLocalPlayerSubsystem> EnhancedInputSubsystem;
 	TWeakObjectPtr<UUserWidget> PlayerUserWidget;
+	bool bAnyKeyPressed = false;
+	bool bSkipKeyPressed = false;
 };
