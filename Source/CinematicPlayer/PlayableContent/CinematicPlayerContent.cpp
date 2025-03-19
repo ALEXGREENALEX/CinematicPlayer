@@ -336,12 +336,12 @@ void ACinematicPlayerContent::ExecuteActionsAsync(const TArray<TObjectPtr<UCinem
 
 	Action->OnActionExecutionFinished.BindWeakLambda(this, [&, NextIndex, Callback](UCinematicPlayerAction* FinishedAction)
 	{
+		ExecuteActionsAsync(Actions, NextIndex, Callback);
+
 		if (IsValid(FinishedAction))
 		{
 			FinishedAction->OnActionExecutionFinished.Unbind();
 		}
-
-		ExecuteActionsAsync(Actions, NextIndex, Callback);
 	});
 
 	Action->ExecuteAction();
