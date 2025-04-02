@@ -19,6 +19,9 @@
 ACinematicPlayerContent::ACinematicPlayerContent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = false;
+
 	InputMappingOptions.bIgnoreAllPressedKeysUntilRelease = true;
 	InputMappingOptions.bForceImmediately = true; // Need update all before Spawn Widget Hint
 }
