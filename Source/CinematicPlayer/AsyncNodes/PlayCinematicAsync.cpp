@@ -80,6 +80,8 @@ void UPlayCinematicAsync::SetReadyToDestroy()
 	}
 
 	Super::SetReadyToDestroy();
+
+	MarkAsGarbage();
 }
 
 #pragma region PlayableContent

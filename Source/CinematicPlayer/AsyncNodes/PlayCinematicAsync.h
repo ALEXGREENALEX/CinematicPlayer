@@ -10,14 +10,14 @@ class ACinematicPlayerContent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayCutsceneAsyncResult);
 
-UCLASS(Meta = (ExposedAsyncProxy))
+UCLASS(BlueprintType, Meta = (ExposedAsyncProxy = "AsyncAction"))
 class CINEMATICPLAYER_API UPlayCinematicAsync : public UBlueprintAsyncActionBase
 {
 	GENERATED_BODY()
 
 public:
 	// Allow to play Cinematic Content like Movies and Level Sequences Async.
-	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", Meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"))
+	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", DisplayName = "Play Cinematic Async", Meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"))
 	static UPlayCinematicAsync* PlayCinematicAsync(UObject* WorldContextObject, APlayerController* PlayerController, TSoftClassPtr<ACinematicPlayerContent> Content);
 
 	// Begin UBlueprintAsyncActionBase interface
