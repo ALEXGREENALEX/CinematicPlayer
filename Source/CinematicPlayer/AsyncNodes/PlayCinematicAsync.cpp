@@ -62,10 +62,11 @@ void UPlayCinematicAsync::Activate()
 			PlayerContent->OnStop.AddDynamic(this, &UPlayCinematicAsync::StopCallback);
 			PlayerContent->OnFinish.AddDynamic(this, &UPlayCinematicAsync::FinishCallback);
 			PlayerContent->Initialize(PlayerController);
+			PlayableContent = PlayerContent;
 		}
 	};
 
-	PlayableContent = World->SpawnActor<ACinematicPlayerContent>(ContentClass, SpawnInfo);
+	World->SpawnActor<ACinematicPlayerContent>(ContentClass, SpawnInfo);
 }
 
 void UPlayCinematicAsync::SetReadyToDestroy()
