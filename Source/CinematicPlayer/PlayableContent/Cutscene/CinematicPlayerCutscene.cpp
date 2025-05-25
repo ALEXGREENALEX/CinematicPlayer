@@ -16,6 +16,16 @@ ACinematicPlayerCutscene::ACinematicPlayerCutscene(const FObjectInitializer& Obj
 {
 }
 
+ALevelSequenceActor* ACinematicPlayerCutscene::GetLevelSequenceActor() const
+{
+	return LevelSequenceActor.Get();
+}
+
+ULevelSequencePlayer* ACinematicPlayerCutscene::GetLevelSequencePlayer() const
+{
+	return LevelSequenceActor.IsValid() ? LevelSequenceActor->GetSequencePlayer() : nullptr;
+}
+
 void ACinematicPlayerCutscene::BeginPlay()
 {
 	if (!IsValid(LevelSequence))

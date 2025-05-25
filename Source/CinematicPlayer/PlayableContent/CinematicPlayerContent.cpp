@@ -376,6 +376,11 @@ void ACinematicPlayerContent::ForEachCinematicPlayerAction(const TFunctionRef<vo
 
 void ACinematicPlayerContent::AddInputMapping_Implementation()
 {
+	if (!bCanSkip)
+	{
+		return;
+	}
+
 	if (!IsValid(InputMappingContext))
 	{
 		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] InputMappingContext is Not Valid!", FUNC_STR);
@@ -407,6 +412,17 @@ void ACinematicPlayerContent::AddInputMapping_Implementation()
 
 void ACinematicPlayerContent::RemoveInputMapping_Implementation()
 {
+	if (!bCanSkip)
+	{
+		return;
+	}
+
+	if (!IsValid(InputMappingContext))
+	{
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] InputMappingContext is Not Valid!", FUNC_STR);
+		return;
+	}
+
 	if (EnhancedInputSubsystem.IsValid())
 	{
 		EnhancedInputSubsystem->RemoveMappingContext(InputMappingContext, InputMappingOptions);

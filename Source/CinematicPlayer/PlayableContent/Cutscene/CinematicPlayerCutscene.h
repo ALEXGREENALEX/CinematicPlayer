@@ -6,8 +6,9 @@
 #include <Templates/SubclassOf.h>
 #include "CinematicPlayerCutscene.generated.h"
 
-class ULevelSequence;
 class ALevelSequenceActor;
+class ULevelSequence;
+class ULevelSequencePlayer;
 
 /**
  * Allow to play Cutscenes (Level Sequences).
@@ -19,6 +20,12 @@ class CINEMATICPLAYER_API ACinematicPlayerCutscene : public ACinematicPlayerCont
 
 public:
 	ACinematicPlayerCutscene(const FObjectInitializer& ObjectInitializer);
+
+	UFUNCTION(BlueprintPure, Category = "CinematicPlayer|Cutscene")
+	ALevelSequenceActor* GetLevelSequenceActor() const;
+
+	UFUNCTION(BlueprintPure, Category = "CinematicPlayer|Cutscene")
+	ULevelSequencePlayer* GetLevelSequencePlayer() const;
 
 	// Begin ACinematicPlayerContent overrides
 protected:
