@@ -30,7 +30,7 @@ void ACinematicPlayerCutscene::BeginPlay()
 {
 	if (!IsValid(LevelSequence))
 	{
-		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] LevelSequence is Not Valid!", FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] LevelSequence is Not Valid!", __FUNCTION__);
 		return;
 	}
 
@@ -89,7 +89,7 @@ bool ACinematicPlayerCutscene::OpenAndPlayContent()
 {
 	if (!LevelSequenceActor.IsValid())
 	{
-		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] LevelSequenceActor is Not Valid!", FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] LevelSequenceActor is Not Valid!", __FUNCTION__);
 		PlaybackStopped();
 		return false;
 	}
@@ -97,7 +97,7 @@ bool ACinematicPlayerCutscene::OpenAndPlayContent()
 	ULevelSequencePlayer* SequencePlayer = LevelSequenceActor->GetSequencePlayer();
 	if (!IsValid(SequencePlayer) || !SequencePlayer->IsValid())
 	{
-		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] SequencePlayer is Not Valid!", FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] SequencePlayer is Not Valid!", __FUNCTION__);
 		PlaybackStopped();
 		return false;
 	}

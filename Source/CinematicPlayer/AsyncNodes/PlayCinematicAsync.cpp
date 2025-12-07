@@ -38,7 +38,7 @@ void UPlayCinematicAsync::Activate()
 
 	if (!PlayerController.IsValid())
 	{
-		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] PlayerController is Not Valid!", FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] PlayerController is Not Valid!", __FUNCTION__);
 		SetReadyToDestroy();
 		return;
 	}
@@ -46,7 +46,7 @@ void UPlayCinematicAsync::Activate()
 	const TSubclassOf<ACinematicPlayerContent> ContentClass = ContentSoftClass.IsNull() ? nullptr : ContentSoftClass.LoadSynchronous();
 	if (!IsValid(ContentClass))
 	{
-		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] ContentClass is Not Valid!", FUNC_STR);
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] ContentClass is Not Valid!", __FUNCTION__);
 		SetReadyToDestroy();
 		return;
 	}
