@@ -21,15 +21,10 @@ class CINEMATICPLAYER_API ACinematicPlayerCutscene : public ACinematicPlayerCont
 public:
 	ACinematicPlayerCutscene(const FObjectInitializer& ObjectInitializer);
 
-	UFUNCTION(BlueprintPure, Category = "CinematicPlayer|Cutscene")
-	ALevelSequenceActor* GetLevelSequenceActor() const;
-
-	UFUNCTION(BlueprintPure, Category = "CinematicPlayer|Cutscene")
-	ULevelSequencePlayer* GetLevelSequencePlayer() const;
-
 	// Begin ACinematicPlayerContent overrides
+	virtual void PostInitializeComponents() override;
+
 protected:
-	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual bool OpenAndPlayContent() override;
@@ -49,7 +44,13 @@ public:
 	virtual void Resume() override;
 	// End ACinematicPlayerContent overrides
 
-private:
+	UFUNCTION(BlueprintPure, Category = "CinematicPlayer|Cutscene")
+	ALevelSequenceActor* GetLevelSequenceActor() const;
+
+	UFUNCTION(BlueprintPure, Category = "CinematicPlayer|Cutscene")
+	ULevelSequencePlayer* GetLevelSequencePlayer() const;
+
+protected:
 	UFUNCTION()
 	void OnPlay_Callback();
 

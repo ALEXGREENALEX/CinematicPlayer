@@ -17,8 +17,9 @@ class CINEMATICPLAYER_API ACinematicPlayerMovie : public ACinematicPlayerContent
 	GENERATED_BODY()
 
 	// Begin ACinematicPlayerContent overrides
+	virtual void PostInitializeComponents() override;
+
 protected:
-	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual bool OpenAndPlayContent() override;
@@ -37,7 +38,7 @@ public:
 	virtual void Resume() override;
 	// End ACinematicPlayerContent overrides
 
-private:
+protected:
 	UFUNCTION()
 	void OnMediaOpened_Callback(FString OpenedUrl);
 

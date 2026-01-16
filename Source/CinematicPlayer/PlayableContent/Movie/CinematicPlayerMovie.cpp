@@ -1,16 +1,25 @@
 ﻿// Copyright 2023 - 2026 Alex Zelenskyi. All Rights Reserved.
 
 #include "CinematicPlayerMovie.h"
-#include <GameFramework/PlayerController.h>
+#include <Engine/World.h>
 #include <FileMediaSource.h>
+#include <GameFramework/PlayerController.h>
 #include <MediaPlayer.h>
 #include "Logs/CinematicPlayerLogs.h"
 #include "Data/CinematicDataValidationContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CinematicPlayerMovie)
 
-void ACinematicPlayerMovie::BeginPlay()
+void ACinematicPlayerMovie::PostInitializeComponents()
 {
+	Super::PostInitializeComponents();
+
+	const UWorld* World = GetWorld();
+	if (!IsValid(World) || World->bIsTearingDown || !World->IsGameWorld())
+	{
+		return;
+	}
+
 	if (!IsValid(MediaPlayer))
 	{
 		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] MediaPlayer is Not Valid!", __FUNCTION__);
@@ -25,8 +34,6 @@ void ACinematicPlayerMovie::BeginPlay()
 	MediaPlayer->OnMediaOpenFailed.AddDynamic(this, &ACinematicPlayerMovie::OnMediaOpenFailed_Callback);
 	MediaPlayer->OnMediaClosed.AddDynamic(this, &ACinematicPlayerMovie::OnMediaClosed_Callback);
 	MediaPlayer->OnEndReached.AddDynamic(this, &ACinematicPlayerMovie::OnEndReached_Callback);
-
-	Super::BeginPlay();
 }
 
 void ACinematicPlayerMovie::EndPlay(const EEndPlayReason::Type EndPlayReason)

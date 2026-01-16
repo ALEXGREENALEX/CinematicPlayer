@@ -16,27 +16,19 @@ ACinematicPlayerCutscene::ACinematicPlayerCutscene(const FObjectInitializer& Obj
 {
 }
 
-ALevelSequenceActor* ACinematicPlayerCutscene::GetLevelSequenceActor() const
+void ACinematicPlayerCutscene::PostInitializeComponents()
 {
-	return LevelSequenceActor.Get();
-}
+	Super::PostInitializeComponents();
 
-ULevelSequencePlayer* ACinematicPlayerCutscene::GetLevelSequencePlayer() const
-{
-	return LevelSequenceActor.IsValid() ? LevelSequenceActor->GetSequencePlayer() : nullptr;
-}
-
-void ACinematicPlayerCutscene::BeginPlay()
-{
-	if (!IsValid(LevelSequence))
+	UWorld* World = GetWorld();
+	if (!IsValid(World) || World->bIsTearingDown || !World->IsGameWorld())
 	{
-		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] LevelSequence is Not Valid!", __FUNCTION__);
 		return;
 	}
 
-	UWorld* World = GetWorld();
-	if (!IsValid(World) || World->bIsTearingDown)
+	if (!IsValid(LevelSequence))
 	{
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] LevelSequence is Not Valid!", __FUNCTION__);
 		return;
 	}
 
@@ -44,25 +36,26 @@ void ACinematicPlayerCutscene::BeginPlay()
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnInfo.ObjectFlags |= RF_Transient;
 	SpawnInfo.Owner = this;
-	SpawnInfo.CustomPreSpawnInitalization = [this](AActor* SpawnedActor)
-	{
-		if (ALevelSequenceActor* SequenceActor = CastChecked<ALevelSequenceActor>(SpawnedActor))
-		{
-			ULevelSequencePlayer* SequencePlayer = SequenceActor->GetSequencePlayer();
-			if (IsValid(SequencePlayer))
-			{
-				SequencePlayer->OnPlay.AddDynamic(this, &ACinematicPlayerCutscene::OnPlay_Callback);
-				SequencePlayer->OnFinished.AddDynamic(this, &ACinematicPlayerCutscene::OnFinished_Callback);
-			}
-
-			SequenceActor->SetSequence(LevelSequence);
-			SequenceActor->InitializePlayer();
-		}
-	};
+	SpawnInfo.bAllowDuringConstructionScript = true;
+	SpawnInfo.bDeferConstruction = true;
 
 	LevelSequenceActor = World->SpawnActor<ALevelSequenceActor>(LevelSequenceActorClass, SpawnInfo);
+	if (!LevelSequenceActor.IsValid())
+	{
+		UE_LOGFMT(LogCinematicPlayer, Error, "[{FUNC}] Can't spawn LevelSequenceActor!", __FUNCTION__);
+		return;
+	}
 
-	Super::BeginPlay();
+	ULevelSequencePlayer* SequencePlayer = LevelSequenceActor->GetSequencePlayer();
+	if (IsValid(SequencePlayer))
+	{
+		SequencePlayer->OnPlay.AddDynamic(this, &ACinematicPlayerCutscene::OnPlay_Callback);
+		SequencePlayer->OnFinished.AddDynamic(this, &ACinematicPlayerCutscene::OnFinished_Callback);
+	}
+
+	LevelSequenceActor->SetSequence(LevelSequence);
+	LevelSequenceActor->InitializePlayer();
+	LevelSequenceActor->FinishSpawning(FTransform::Identity);
 }
 
 void ACinematicPlayerCutscene::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -171,6 +164,16 @@ void ACinematicPlayerCutscene::Resume()
 			SequencePlayer->Play();
 		}
 	}
+}
+
+ALevelSequenceActor* ACinematicPlayerCutscene::GetLevelSequenceActor() const
+{
+	return LevelSequenceActor.Get();
+}
+
+ULevelSequencePlayer* ACinematicPlayerCutscene::GetLevelSequencePlayer() const
+{
+	return LevelSequenceActor.IsValid() ? LevelSequenceActor->GetSequencePlayer() : nullptr;
 }
 
 void ACinematicPlayerCutscene::OnPlay_Callback()
