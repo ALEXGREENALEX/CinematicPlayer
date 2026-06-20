@@ -2,28 +2,57 @@
 
 #pragma once
 
-#include <CoreMinimal.h>
-#include <Kismet/BlueprintAsyncActionBase.h>
+#include <Engine/CancellableAsyncAction.h>
+#include <UObject/UObjectArray.h>
 #include "PlayCinematicAsync.generated.h"
+
+struct FStreamableHandle;
 
 class ACinematicPlayerContent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayCutsceneAsyncResult);
 
 UCLASS(BlueprintType, Meta = (ExposedAsyncProxy = "AsyncAction"))
-class CINEMATICPLAYER_API UPlayCinematicAsync : public UBlueprintAsyncActionBase
+class CINEMATICPLAYER_API UPlayCinematicAsync : public UCancellableAsyncAction, public FUObjectArray::FUObjectDeleteListener
 {
 	GENERATED_BODY()
 
 public:
-	// Allow to play Cinematic Content like Movies and Level Sequences Async.
-	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", DisplayName = "Play Cinematic Async", Meta = (WorldContext = "WorldContextObject", BlueprintInternalUseOnly = "true"))
-	static UPlayCinematicAsync* PlayCinematicAsync(UObject* WorldContextObject, APlayerController* PlayerController, TSoftClassPtr<ACinematicPlayerContent> Content);
+	/**
+	 * Allow to play Cinematic Content like Movies and Level Sequences.
+	 * 
+	 * @param WorldContext - Object that we can obtain a world context from.
+	 * @param PlayerController - The player controller on which to play the Cinematic.
+	 * @param Content - Cinematic content to play (usually with Sequence or Movie).
+	 * @param bAutoDestroy - Try to destroy Automatically with WorldContext (AsyncAction Outer).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", DisplayName = "Play Cinematic", Meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContext", AdvancedDisplay = "3"))
+	static UPlayCinematicAsync* PlayCinematic(UObject* WorldContext, APlayerController* PlayerController, TSubclassOf<ACinematicPlayerContent> Content,
+		bool bAutoDestroy = true);
+
+	/**
+	 * Allow to play Cinematic Content like Movies and Level Sequences Async.
+	 * 
+	 * @param WorldContext - Object that we can obtain a world context from.
+	 * @param PlayerController - The player controller on which to play the Cinematic.
+	 * @param Content - Cinematic content to play (usually with Sequence or Movie).
+	 * @param AsyncLoadPriority - Priority to pass to the streaming system, higher priority will be loaded first.
+	 * @param bAutoDestroy - Try to destroy Automatically with WorldContext (AsyncAction Outer).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer", DisplayName = "Play Cinematic Async", Meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContext", AdvancedDisplay = "3"))
+	static UPlayCinematicAsync* PlayCinematicAsync(UObject* WorldContext, APlayerController* PlayerController, TSoftClassPtr<ACinematicPlayerContent> Content,
+		int32 AsyncLoadPriority = 100, bool bAutoDestroy = true);
 
 	// Begin UBlueprintAsyncActionBase interface
 	virtual void Activate() override;
 	virtual void SetReadyToDestroy() override;
+	virtual void BeginDestroy() override;
 	// End UBlueprintAsyncActionBase interface
+
+	// Begin FUObjectDeleteListener Interface
+	virtual void NotifyUObjectDeleted(const UObjectBase* Object, int32 Index) override;
+	virtual void OnUObjectArrayShutdown() override;
+	// End FUObjectDeleteListener Interface
 
 #pragma region PlayableContent
 	UFUNCTION(BlueprintPure, Category = "CinematicPlayer")
@@ -44,6 +73,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CinematicPlayer")
 	virtual void Resume();
 #pragma endregion PlayableContent
+
+protected:
+	void SpawnCinematicPlayerContent(const TSubclassOf<ACinematicPlayerContent> ContentClass);
 
 private:
 	UFUNCTION()
@@ -71,5 +103,10 @@ public:
 private:
 	TWeakObjectPtr<APlayerController> PlayerController;
 	TSoftClassPtr<ACinematicPlayerContent> ContentSoftClass;
+	bool bAutoDestroy = true;
+	int32 AsyncLoadPriority = 100;
+
+	const UObjectBase* AutoDestroyOwnerPtr = nullptr;
+	TSharedPtr<FStreamableHandle> StreamingHandle;
 	TWeakObjectPtr<ACinematicPlayerContent> PlayableContent;
 };

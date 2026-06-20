@@ -35,6 +35,8 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category = "Data Validation")
 	void ValidateData(UPARAM(ref) FCinematicDataValidationContext& Context, const FString& PropertyPath) const;
+
+protected:
 	virtual void ValidateData_Implementation(FCinematicDataValidationContext& Context, const FString& PropertyPath) const { ; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "Data Validation", Meta = (AutoCreateRefTerm = "PropertyPath, Message"))
@@ -47,6 +49,7 @@ public:
 	virtual void LogAddInfoNote(UPARAM(ref) FCinematicDataValidationContext& Context, const FString& PropertyPath, const FText& Message) const;
 #pragma endregion Data Validation
 
+public:
 	virtual void Initialize(ACinematicPlayerContent* CinematicPlayerContent);
 	virtual void Construct();
 	virtual void Destruct();
@@ -69,6 +72,7 @@ protected:
 	virtual void ActionExecutionFinished(bool bExecutionResult);
 
 #pragma region Blueprint Events
+
 public:
 	/**
 	 * Allow to make Actions Async.
